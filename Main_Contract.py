@@ -14,6 +14,7 @@ pd.options.mode.chained_assignment = None
 # st.session_state["senior"] = None
 # st.session_state["senior and early booking"] = None
 
+
 # Add this line at the end of your script or function to re-enable the warning
 pd.options.mode.chained_assignment = 'warn'
 
