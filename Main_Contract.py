@@ -592,7 +592,7 @@ elif password == ps:
         def offer_con(price,per):
             price -= (price * (per/100))  
             return price
-            
+        st.write("hi")
         # Here are the other new offers
         if "Offers_dict" in st.session_state:
             Offers_dict = st.session_state["Offers_dict"]
