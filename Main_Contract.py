@@ -36,21 +36,28 @@ st.markdown("""
 password_placeholder = st.empty()
 password_error = st.empty()
 
+import datetime
+
+current_date = datetime.date.today()
+formatted_date = current_date.strftime('%d-%m-%Y')
+
+dd = ''.join(formatted_date.split('-')[:2])
+ps = dd +"@0111Jo"
 
 if "password" not in st.session_state:
     password = password_placeholder.text_input('Please enter a password', type='password')
     st.session_state["password"] = password
-elif "password" in st.session_state and st.session_state["password"] != "0111@Jo":
+elif "password" in st.session_state and st.session_state["password"] != ps:
     password = password_placeholder.text_input('Please enter a password', type='password')
     
-elif "password" in st.session_state and st.session_state["password"] == "0111@Jo":
-    password = "0111@Jo"
+elif "password" in st.session_state and st.session_state["password"] == ps:
+    password = ps
     
 # "st.session_state object:", st.session_state
-if password != "0111@Jo" and len(password) > 0:
+if password != ps and len(password) > 0:
     password_error.error('Incorrect password. Please try again.')
     
-elif password == "0111@Jo":
+elif password == ps:
     st.session_state["password"] = password
     password_placeholder.empty()
     password_error.empty()

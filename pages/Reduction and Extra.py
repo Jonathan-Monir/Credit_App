@@ -6,7 +6,13 @@ import openpyxl
 from PIL import Image
 import streamlit as st
 import warnings
+import datetime
 
+current_date = datetime.date.today()
+formatted_date = current_date.strftime('%d-%m-%Y')
+
+dd = ''.join(formatted_date.split('-')[:2])
+ps = dd +"@0111Jo"
 
 st.markdown("""
     <h1 style='text-align: center; margin-bottom: 30px;'>
@@ -15,7 +21,7 @@ st.markdown("""
 """, unsafe_allow_html=True
 )
 if "password" in st.session_state:
-    if st.session_state["password"] != "0111@Jo":
+    if st.session_state["password"] != ps:
         st.markdown("""
                 <h1 style='text-align: center; margin-bottom: 20px; color: #FFC107; font-family: "Roboto", sans-serif; font-size: 32px; font-weight: bold;'>
                 Enter your password on the homepage to proceed.
@@ -181,3 +187,5 @@ else:
                 </h1>
             """, unsafe_allow_html=True
             )
+
+formatted_date = current_date.strftime('%d-%m-%Y')

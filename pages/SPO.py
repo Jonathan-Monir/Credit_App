@@ -167,8 +167,13 @@ def spo_offers(i,spo_dict):
         else:
             spo_dict['reduc2 percentage'].append(0)
             
-            
-    
+import datetime
+
+current_date = datetime.date.today()
+formatted_date = current_date.strftime('%d-%m-%Y')
+
+dd = ''.join(formatted_date.split('-')[:2])
+ps = dd +"@0111Jo"
         
 
 st.markdown("""
@@ -178,7 +183,7 @@ st.markdown("""
 """, unsafe_allow_html=True
 )
 if "password" in st.session_state:
-    if st.session_state["password"] != "0111@Jo":
+    if st.session_state["password"] != ps:
         st.markdown("""
                 <h1 style='text-align: center; margin-bottom: 20px; color: #FFC107; font-family: "Roboto", sans-serif; font-size: 32px; font-weight: bold;'>
                 Enter your password on the homepage to proceed.
