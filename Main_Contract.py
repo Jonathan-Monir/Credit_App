@@ -592,7 +592,6 @@ elif password == ps:
         def offer_con(price,per):
             price -= (price * (per/100))  
             return price
-        st.write("hi")
         # Here are the other new offers
         if "Offers_dict" in st.session_state:
             Offers_dict = st.session_state["Offers_dict"]
@@ -624,7 +623,7 @@ elif password == ps:
                 # Early booking 1
                 if "eb1" in Offers_dict:
                     if Offers_dict["eb1"]:
-                        if statment["Res_date"][i] <= Offers_dict["eb1 date"]:
+                        if statment["Res_date"][i] <= pd.Timestamp(Offers_dict["eb1 date"]):
                             F_eb1()
                             
                 # Early booking 2

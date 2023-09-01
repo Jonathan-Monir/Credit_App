@@ -30,6 +30,29 @@ if "password" in st.session_state:
             )
 
     else:
+        import json  # Import the json module
+
+        file_path = "reductions.json"
+        #loading files
+        try:
+            with open(file_path, 'r') as json_file:
+                # Attempt to load the JSON content
+                try:
+                    load_dict = json.load(json_file)
+                    st.write(load_dict)
+                    # Check if the loaded data structure is not empty
+                    if load_dict:
+                        print("JSON file is not empty.")
+                    else:
+                        print("JSON file is empty.")
+                except json.JSONDecodeError as e:
+                    st.write(f"File '{file_path}' contains invalid JSON: {e}")
+        except FileNotFoundError:
+            st.write(f"File '{file_path}' not found.")
+        except Exception as e:
+            st.write(f"An error occurred: {e}")
+            
+        
         Offers_dict = {'eb1':False,
                        'eb1 percentage':0,
                        'eb1 date':None,
@@ -188,30 +211,12 @@ if "password" in st.session_state:
         comb_dict = dict()
         import json
         #load
-        file_path = "reductions.json"
-        # try:
-        #     with open(file_path, 'r') as json_file:
-        #         # Attempt to load the JSON content
-        #         try:
-        #             load_dict = json.load(json_file)
-
-        #             # Check if the loaded data structure is not empty
-        #             if load_dict:
-        #                 print("JSON file is not empty.")
-        #             else:
-        #                 print("JSON file is empty.")
-        #         except json.JSONDecodeError as e:
-        #             print(f"File '{file_path}' contains invalid JSON: {e}")
-        # except FileNotFoundError:
-        #     print(f"File '{file_path}' not found.")
-        # except Exception as e:
-        #     print(f"An error occurred: {e}")
             
         # save
         save_data = Offers_dict.copy()
         if apply_button:
             if len(user_input)>0:
-                if ((save_data['eb1 date']) is not None) and (save_data['eb1 date'] is not None):
+                if ((save_data['eb1 date']) is not None) and (save_data['eb2 date'] is not None):
                     st.write('hi')
                     save_data['eb1 date'] = save_data['eb1 date'].strftime("%Y-%m-%d")
                     save_data['eb2 date'] = save_data['eb2 date'].strftime("%Y-%m-%d")
