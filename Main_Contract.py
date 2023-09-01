@@ -6,25 +6,7 @@ import openpyxl
 from PIL import Image
 import streamlit as st
 import warnings
-addfile = st.button("add to file",key=120394)
-lines = ['Readme', 'How to write text files in Python']
-file_path = 'files.txt'
-with open(file_path, 'r') as file:
-    for line in file:
-        st.write(line, end='')  # Print each line without an extra newline
 
-def write():
-    with open('files.txt', 'w') as f:
-        for line in lines:
-            f.write(line)
-            f.write('\n')
-    file_path = 'files.txt'
-    with open(file_path, 'r') as file:
-        for line in file:
-            st.write(line, end='')  # Print each line without an extra newline
-
-if addfile:
-    write()
 # Add this line at the beginning of your script or function to ignore the warning
 pd.options.mode.chained_assignment = None
 
