@@ -67,7 +67,7 @@ if "password" in st.session_state:
             Offers_dict['eb1 percentage'] = eb1_per
             Offers_dict['eb1 date'] = eb1_date
             
-        #eb1
+        #eb2
         if "eb2" in st.session_state:
             eb2 =  c12.checkbox("Early booking 2",value=st.session_state['eb2'],key=4)
         else:

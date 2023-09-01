@@ -6,7 +6,15 @@ import openpyxl
 from PIL import Image
 import streamlit as st
 import warnings
-
+addfile = st.button("add to file",key=120394)
+lines = ['Readme', 'How to write text files in Python']
+def write():
+    with open('files.txt', 'w') as f:
+        for line in lines:
+            f.write(line)
+            f.write('\n')
+if addfile:
+    write()
 # Add this line at the beginning of your script or function to ignore the warning
 pd.options.mode.chained_assignment = None
 
@@ -153,11 +161,17 @@ elif password == "0111@Jo":
             'Choose Arrival column',
             statment.columns)]
             
+        # preprocessing
         first_row = statment.iloc[0]
         num_nan = first_row.isnull().sum()
         shifted = False
         print(statment.info())
-        
+        # Get the number of null values in each row
+        statment['count_nan'] = statment.isnull().sum(axis=1)
+
+        # Drop rows with more than 3 null values
+        statment = statment[statment['count_nan'] <= 3]
+        statment.drop(columns=['count_nan'],inplace= True)
         if statment['Arrival'].dtype == 'object':
             statment['Arrival'] = pd.to_datetime(statment['Arrival'])
         if statment['Departure'].dtype == 'object':
@@ -174,7 +188,6 @@ elif password == "0111@Jo":
         statment.drop(columns=columns_to_drop, inplace=True)
 
         # Print the DataFrame after dropping the columns
-
 
         while num_nan >= 6:
             shifted = True
@@ -205,7 +218,6 @@ elif password == "0111@Jo":
         statment["UnNeeded_price"]=0
         statment["Total price currency"]=0
 
-        st.write(statment)
         SPO_name = st.selectbox(
             'Choose special offer sheet',
             sheet_names, key="0")
@@ -237,7 +249,7 @@ elif password == "0111@Jo":
                 departure_row = con[(con["first date"]<=date_departure) & (con["second date"]>=date_departure)]
                 # if arrival_row.isnull().any().item():
                 #     break
-                st.write(arrival_row)
+                
                 price_arrival_night = arrival_row[rate_code]
                 
                 date1_arrival = pd.to_datetime(arrival_row["first date"].values[0])
@@ -327,7 +339,7 @@ elif password == "0111@Jo":
                     
                     arrival_row = con[(con["first date"]<=date_arrival) & (con["second date"]>=date_arrival)]
                     departure_row = con[(con["first date"]<=date_departure) & (con["second date"]>=date_departure)]
-
+                    
                     price_arrival_night = arrival_row[rate_code]
                     date1_arrival = pd.to_datetime(arrival_row["first date"].values[0])
                     
@@ -353,6 +365,7 @@ elif password == "0111@Jo":
                 else:
                     arrival_row = spo[(spo["first date"]<=date_arrival) & (spo["second date"]>=date_arrival)]
                     departure_row = spo[(spo["first date"]<=date_departure) & (spo["second date"]>=date_departure)]
+                    
                     price_arrival_night = arrival_row[rate_code]
                     
                     
@@ -480,6 +493,7 @@ elif password == "0111@Jo":
                         rate_code = statment["Rate code"][i]
                         arrival_row = spo2[(spo2["first date"]<=date_arrival) & (spo2["second date"]>=date_arrival)]
                         departure_row = spo2[(spo2["first date"]<=date_departure) & (spo2["second date"]>=date_departure)]
+                        
                         price_arrival_night = arrival_row[rate_code]
                         date1_arrival = pd.to_datetime(arrival_row["first date"].values[0])
                         date2_arrival = pd.to_datetime(arrival_row["second date"].values[0])
@@ -575,6 +589,10 @@ elif password == "0111@Jo":
             
         def offer(i,per):
             statment["Total price currency"][i] -= (statment["Total price currency"][i] * (per/100))  
+            
+        def offer_con(price,per):
+            price -= (price * (per/100))  
+            return price
             
         # Here are the other new offers
         if "Offers_dict" in st.session_state:
@@ -719,17 +737,96 @@ elif password == "0111@Jo":
                 price = price * (1 - (Spo_dict['reduc2 percentage'][spo_num]/100))
             return price
         
+        def calculate_offer_con(cell,price):
+                        
+                        
+            # Early booking 1
+            if "eb1" in Offers_dict:
+                if Offers_dict["eb1"]:
+                    if cell["Res_date"] <= Offers_dict["eb1 date"]:
+                        price = offer_con(price,Offers_dict['eb1 percentage'])
+                        
+            # Early booking 2
+            if "eb2" in Offers_dict:
+                if Offers_dict["eb2"]:
+                    if (cell["Res_date"] <= Offers_dict["eb2 date"] and cell["Res_date"] > Offers_dict["eb1 date"]):
+                        price = offer_con(price,Offers_dict['eb2 percentage'])
+                        
+            if "FormSubmitter:Combinations-Submit" in st.session_state:
+                if st.session_state["FormSubmitter:Combinations-Submit"]:
+                    Combin_dict = st.session_state['Combin_dict']
+                    
+            #senior
+            if "senior" in Offers_dict:
+                if Offers_dict["senior"]:
+                    if cell["Senior No."] >0:
+                        Type_of_room = cell["Rate code"][0].lower()
+                        
+                        # adjusting room type
+                        
+                        type_of_room_mapping = {
+                            "s": 1,
+                            "d": 2,
+                            "t": 3,
+                            "q": 4
+                        }
+
+                        if Type_of_room in type_of_room_mapping:
+                            mapped_value = type_of_room_mapping[Type_of_room]
+
+                        
+                        Total_price = price * (cell["Senior No."]/int(mapped_value)) * -(Offers_dict["senior percentage"]/100)
+                        price += Total_price
+                        
+                        
+            # long term
+            if "lt" in Offers_dict:
+                if (Offers_dict["lt"]):
+                    if "FormSubmitter:Combinations-Submit" not in st.session_state:
+                        if ((cell["Departure"] - cell["Arrival"]).days > Offers_dict["lt days"]):
+                            price = offer_con(price,Offers_dict['lt percentage'])
+                    else:
+                        if Combin_dict["long term_combin"]:
+                            if ((cell["Departure"] - cell["Arrival"]).days > Offers_dict["lt days"]):
+                                price = offer_con(price,Offers_dict['lt percentage'])
+                                
+                        
+            # reduction 1
+            if "reduc" in Offers_dict:
+                if (Offers_dict["reduc"]):
+                    if "FormSubmitter:Combinations-Submit" not in st.session_state:
+                        price = offer_con(price,Offers_dict['reduc1 percentage'])
+                else:
+                    if "reduction_combin" in Offers_dict:
+                        if Offers_dict["reduction_combin"]:
+                            price = offer_con(price,Offers_dict['reduc1 percentage'])
+
+                    
+            # reduction 2
+            if "reduc2" in Offers_dict:
+                if (Offers_dict["reduc2"]):
+                    if "FormSubmitter:Combinations-Submit" not in Offers_dict:
+                        price = offer_con(price,Offers_dict['reduc2 percentage'])
+
+                    else:
+                        if "reduction2_combin" in Combin_dict:
+                            if Combin_dict["reduction2_combin"]:
+                                price = offer_con(price,Offers_dict['reduc2 percentage'])
+
+            return price
+        
         if "Spo_dict" in st.session_state:
             Spo_dict = st.session_state["Spo_dict"]
-            if Spo_dict["count"] > 0:
+            if len(Spo_dict["name"]) > 0:
                 for guest in range(len(statment['Arrival'])):
                     passing = False
                     cnt = 0
-                    for spo_num in reversed(range(Spo_dict['count'])):
+                    for spo_num in reversed(range(len(Spo_dict["name"]))):
                         SPO = Spo_dict['SPO'][spo_num].copy()
                         cell =  statment.iloc[guest,:]
                         if (statment['Res_date'][guest] >= Spo_dict['start_date'][spo_num]) and (statment['Res_date'][guest] <= Spo_dict['end_date'][spo_num]):
                             if (statment['Arrival'][guest] >= SPO['first date'][0]) and (statment['Arrival'][guest] <= SPO['second date'].iloc[-1]):
+                                
                                 cnt +=1
                                 if cnt ==1:
                                     statment["Total price currency"][guest] = 0
@@ -737,7 +834,6 @@ elif password == "0111@Jo":
                                 first_day_spo2 = SPO["first date"][0]
                                 last_day_spo2 = SPO["second date"].iloc[-1]
                                 date_arrival = statment["Arrival"][guest]
-                                
                                 if passing:
                                     date_arrival = new_arrival
                                 date_departure = statment["Departure"][guest] - timedelta(1)
@@ -746,6 +842,7 @@ elif password == "0111@Jo":
                                 res_date = statment["Res_date"][guest]
                                 rate_code = statment["Rate code"][guest]
                                 arrival_row = SPO[(SPO["first date"]<=date_arrival) & (SPO["second date"]>=date_arrival)]
+                                
                                 price_arrival_night = arrival_row[rate_code]
                                 date1_arrival = pd.to_datetime(arrival_row["first date"].values[0])
                                 date2_arrival = pd.to_datetime(arrival_row["second date"].values[0])
@@ -756,7 +853,6 @@ elif password == "0111@Jo":
                                 if (not(one_spo)):
                                     date_departure =last_day_spo2
                                 departure_row = SPO[(SPO["first date"]<=date_departure) & (SPO["second date"]>=date_departure)]
-                                
                                 date1_departure = pd.to_datetime(departure_row["first date"].values[0])
                                 date2_departure = pd.to_datetime(departure_row["second date"].values[0])
                                 
@@ -790,6 +886,7 @@ elif password == "0111@Jo":
                                     departure_row = con[(con["first date"]<=date_departure) & (con["second date"]>=date_departure)]
                                     # if arrival_row.isnull().any().item():
                                     #     break
+                                    
                                     price_arrival_night = arrival_row[rate_code]
                                     date1_arrival = pd.to_datetime(arrival_row["first date"].values[0])
                                     date2_arrival = pd.to_datetime(arrival_row["second date"].values[0])
@@ -800,6 +897,7 @@ elif password == "0111@Jo":
                                     if date_departure <= date2_arrival:
                                         price = price_arrival_night * ((date_departure-date_arrival).days +1)
                                         # price = calculate_offer(cell,Spo_dict,price,spo_num)
+                                        price = calculate_offer_con(cell,price)
                                         statment["Total price currency"][guest] += price
                                         
                                     else:
@@ -813,6 +911,7 @@ elif password == "0111@Jo":
                                         
                                         statment.loc[guest,"other_price"] = other_price
                                         price = Summing - other_price 
+                                        price = calculate_offer_con(cell,price)
                                         # price = calculate_offer(cell,Spo_dict,price,spo_num)
                                         statment.loc[guest,"Total price currency"] += price
                                     if checked1:
@@ -829,13 +928,18 @@ elif password == "0111@Jo":
                                  
                 
                             
-                            
+        # extra
+        if "Extra" in statment.columns:
+            statment["Extra"] = statment["Extra"].fillna(0)
+            statment['Total price currency'] += statment['Extra']
+            
         statment.drop(columns=["other_price","UnNeeded_price"],inplace=True)
         statment["Difference Hotel Currency"] = statment["Total price currency"] -  statment["Amount-hotel"]   
         statment['Difference Hotel Currency'] = statment['Difference Hotel Currency'].round(1)
-        statment["Total price LE"] = statment["Total price currency"] * statment["Currency rate"]         
-        statment["Difference Hotel Currency LE"] = statment["Total price LE"] -  statment["Invoice Amount L.E"] 
-        statment['Difference Hotel Currency LE'] = statment['Difference Hotel Currency LE'].round(1)
+        if "Currency rate" in statment.columns:
+            statment["Total price LE"] = statment["Total price currency"] * statment["Currency rate"]         
+            statment["Difference Hotel Currency LE"] = statment["Total price LE"] -  statment["Invoice Amount L.E"] 
+            statment['Difference Hotel Currency LE'] = statment['Difference Hotel Currency LE'].round(1)
           
         # @st.cache_data
         # def convert_df(df):
@@ -893,7 +997,7 @@ elif password == "0111@Jo":
         if 'Adj.' in statment.columns:
             statment.drop(columns="Adj.",inplace=True)
             
-            
+        statment['Total price currency'] = statment['Total price currency'].round(2).apply(lambda x: '{:.2f}'.format(x))
         fill_pattern = PatternFill(patternType='solid',fgColor='C64747')
         import pandas as pd
         if 'Arrival' in statment.columns and pd.api.types.is_datetime64_any_dtype(statment['Arrival']):
@@ -958,10 +1062,11 @@ elif password == "0111@Jo":
             red_format = workbook.add_format({'bg_color': '#FF0000', 'font_color': '#FFFFFF'})
             yellow_format = workbook.add_format({'bg_color': '#FFFF00', 'font_color': '#000000'})
             
-            worksheet.conditional_format(1, df.columns.get_loc("Difference Hotel Currency LE"), len(df.index), df.columns.get_loc("Difference Hotel Currency LE"),
-                                        {'type': 'cell', 'criteria': '>', 'value': 0, 'format': red_format})
-            worksheet.conditional_format(1, df.columns.get_loc("Difference Hotel Currency LE"), len(df.index), df.columns.get_loc("Difference Hotel Currency LE"),
-                                        {'type': 'cell', 'criteria': '<', 'value': 0, 'format': yellow_format})
+            if "Currency rate" in statment.columns:
+                worksheet.conditional_format(1, df.columns.get_loc("Difference Hotel Currency LE"), len(df.index), df.columns.get_loc("Difference Hotel Currency LE"),
+                                            {'type': 'cell', 'criteria': '>', 'value': 0, 'format': red_format})
+                worksheet.conditional_format(1, df.columns.get_loc("Difference Hotel Currency LE"), len(df.index), df.columns.get_loc("Difference Hotel Currency LE"),
+                                            {'type': 'cell', 'criteria': '<', 'value': 0, 'format': yellow_format})
             
             worksheet.conditional_format(1, df.columns.get_loc("Difference Hotel Currency"), len(df.index), df.columns.get_loc("Difference Hotel Currency"),
                                         {'type': 'cell', 'criteria': '>', 'value': 0, 'format': red_format})
@@ -981,11 +1086,11 @@ elif password == "0111@Jo":
                     Folio_column_index = df.columns.get_loc('Folio')
                     cell_value = df.iat[index, Folio_column_index]
                     worksheet.write(index+1, Folio_column_index, cell_value, yellow_format)
-                
-            worksheet.write(0,df.columns.get_loc("Difference Hotel Currency LE"), "Difference Hotel Currency LE", format3)
-            worksheet.write(0,df.columns.get_loc("Total price LE"), "Total price LE", format3)
             worksheet.write(0,df.columns.get_loc("Difference Hotel Currency"), "Difference Hotel Currency", format3)
             worksheet.write(0,df.columns.get_loc("Total price currency"), "Total price currency", format3)
+            if "Currency rate" in statment.columns:
+                worksheet.write(0,df.columns.get_loc("Difference Hotel Currency LE"), "Difference Hotel Currency LE", format3)
+                worksheet.write(0,df.columns.get_loc("Total price LE"), "Total price LE", format3)
             # HEREE
             # worksheet.set_column('A:Z', 20)
             # worksheet.set_column('L:Z', 25)
@@ -1017,7 +1122,7 @@ elif password == "0111@Jo":
 
             st.download_button("Download Excel", processed_data, file_name='Result sheet.xlsx', mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         import numpy as np
-        diffs = statment.loc[np.abs(statment["Difference Hotel Currency"])>0,:]
+        diffs = statment.loc[np.abs(statment["Difference Hotel Currency"])>1,:]
         
         hide_checkbox_label_style = """
             <style>
@@ -1039,7 +1144,6 @@ elif password == "0111@Jo":
 
         # # Get the current filepath
         # current_filepath = os.getcwd()
-        # st.write(current_filepath)
         # # Combine the current filepath with the filename to get the full file path
         # output_filepath = os.path.join(current_filepath, filename)
         # print(output_filepath)
