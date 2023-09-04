@@ -80,7 +80,31 @@ if "password" in st.session_state:
         except Exception as e:
             print(f"SPO_An error occurred: {e}")
             
-        
+        import json
+
+        def delete_dictionary_from_json(file_path, key_to_delete):
+            try:
+                # Step 1: Read the JSON file into a Python data structure
+                with open(file_path, 'r') as json_file:
+                    data = json.load(json_file)
+            except FileNotFoundError:
+                print(f"File '{file_path}' not found.")
+                return False
+
+            # Step 2: Remove the dictionary or key-value pair you want to delete
+            if key_to_delete in data:
+                del data[key_to_delete]
+            else:
+                print(f"Key '{key_to_delete}' not found in the JSON data.")
+                return False
+
+            # Step 3: Write the updated data structure back to the JSON file
+            with open(file_path, 'w') as json_file:
+                json.dump(data, json_file, indent=4)
+
+            print(f"Dictionary with key '{key_to_delete}' has been deleted from the JSON file.")
+            return True
+
         Offers_dict = {'eb1':False,
                        'eb1 percentage':0,
                        'eb1 date':None,
@@ -99,6 +123,17 @@ if "password" in st.session_state:
         st.session_state["Offers_dict_None"] = Offers_dict
         red_dict[None] = Offers_dict.copy()
         selected_setting = st.selectbox("select the setting you want to use.",options=red_dict.keys(), index= len(red_dict)-1)
+        if selected_setting is not None:
+            delete = st.button("delete costum")
+            if delete:
+                delete_dictionary_from_json("spo.json",selected_setting)
+                delete_dictionary_from_json("reductions.json",selected_setting)
+                del red_dict[selected_setting]
+                del s_dict[selected_setting]
+                selected_setting = None
+                st.experimental_rerun()
+                
+                
         old_file_dict = red_dict
         form_a = st.form("Offers")
         eb1 = False
