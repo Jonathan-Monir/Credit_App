@@ -818,7 +818,7 @@ elif password == ps:
                     for spo_num in reversed(range(len(Spo_dict["name"]))):
                         SPO = Spo_dict['SPO'][spo_num].copy()
                         cell =  statment.iloc[guest,:]
-                        if (statment['Res_date'][guest] >= Spo_dict['start_date'][spo_num]) and (statment['Res_date'][guest] <= Spo_dict['end_date'][spo_num]):
+                        if (statment['Res_date'][guest] >= pd.Timestamp(Spo_dict['start_date'][spo_num])) and (statment['Res_date'][guest] <= pd.Timestamp(Spo_dict['end_date'][spo_num])):
                             if (statment['Arrival'][guest] >= SPO['first date'][0]) and (statment['Arrival'][guest] <= SPO['second date'].iloc[-1]):
                                 
                                 cnt +=1
