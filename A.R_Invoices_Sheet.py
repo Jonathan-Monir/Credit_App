@@ -36,10 +36,6 @@ password_placeholder = st.empty()
 password_error = st.empty()
 
 import datetime
-if "Spo_dict" in st.session_state:
-    st.write(st.session_state['Spo_dict'],"st.spo")
-if "Offers_dict" in st.session_state:
-    st.write(st.session_state['Offers_dict'],"st.offer")
 current_date = datetime.date.today()
 formatted_date = current_date.strftime('%d-%m-%Y')
 
@@ -814,7 +810,6 @@ elif password == ps:
             return price
         
         if "Spo_dict" in st.session_state:
-            # st.write(Spo_dict)
             Spo_dict = st.session_state["Spo_dict"]
             if len(Spo_dict["name"]) > 0:
                 for guest in range(len(statment['Arrival'])):
