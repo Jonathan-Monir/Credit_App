@@ -1,3 +1,5 @@
+    
+import json
 import pandas as pd
 from openpyxl import Workbook
 from datetime import timedelta
@@ -57,6 +59,30 @@ if "password" in st.session_state:
         except Exception as e:
             print(f"An error occurred: {e}")
         
+        file_path = "combinations.json"
+        #loading files
+        try:
+            with open(file_path, 'r') as json_file:
+                # Attempt to load the JSON content
+                try:
+                    load_dict = json.load(json_file)
+                    # Check if the loaded data structure is not empty
+                    if load_dict:
+                        com_dict = load_dict
+                        print("JSON file is not empty.")
+                    else:
+                        com_dict = dict()
+                        print("JSON file is empty.")
+                except json.JSONDecodeError as e:
+                    com_dict = dict()
+                    print(f"File '{file_path}' contains invalid JSON: {e}")
+        except FileNotFoundError:
+            print(f"File '{file_path}' not found.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            
+            
+            
         file_path = "spo.json"
         
         
@@ -80,7 +106,29 @@ if "password" in st.session_state:
         except Exception as e:
             print(f"SPO_An error occurred: {e}")
             
-        import json
+    
+        # file_path = "extra.json"
+        
+        
+        # try:
+        #     with open(file_path, 'r') as json_file:
+        #         # Attempt to load the JSON content
+        #         try:
+        #             load_dict = json.load(json_file)
+        #             # Check if the loaded data structure is not empty
+        #             if load_dict:
+        #                 e_dict = load_dict
+        #                 print("SPO_JSON file is not empty.")
+        #             else:
+        #                 e_dict = dict()
+        #                 print("SPO_JSON file is empty.")
+        #         except json.JSONDecodeError as e:
+        #             e_dict = dict()
+        #             print(f"SPO_File '{file_path}' contains invalid JSON: {e}")
+        # except FileNotFoundError:
+        #     print(f"SPO_File '{file_path}' not found.")
+        # except Exception as e:
+        #     print(f"SPO_An error occurred: {e}")
 
         def delete_dictionary_from_json(file_path, key_to_delete):
             try:
@@ -122,6 +170,13 @@ if "password" in st.session_state:
                        'reduc2 percentage':0}
         st.session_state["Offers_dict_None"] = Offers_dict
         red_dict[None] = Offers_dict.copy()
+        if "null" in s_dict.keys():
+            delete_dictionary_from_json('spo.json','null')
+            del s_dict['null']
+            
+        if "null" in red_dict.keys():
+            delete_dictionary_from_json('reductions.json','null')
+            del red_dict['null']
         selected_setting = st.selectbox("select the setting you want to use.",options=red_dict.keys(), index= len(red_dict)-1)
         if selected_setting is not None:
             delete = st.button("delete costum")
@@ -132,9 +187,17 @@ if "password" in st.session_state:
                 del s_dict[selected_setting]
                 selected_setting = None
                 st.experimental_rerun()
-                
-                
         old_file_dict = red_dict
+                
+        column1,column2 = st.columns([1,3.5])
+                
+        # Recuctions
+        column1.markdown("""
+                <h1 style='text-align: center; margin-bottom: 0px; font-family: "Roboto", sans-serif; font-size: 25px; font-weight: bold;'>
+                Discounts
+                </h1>
+            """, unsafe_allow_html=True
+            )
         form_a = st.form("Offers")
         eb1 = False
         eb2 = False
@@ -146,7 +209,8 @@ if "password" in st.session_state:
         
         
         # checkboxes
-        st.session_state['new offers'] = Offers_dict            
+        if 'Offers_dict' in st.session_state:
+            st.session_state['Offers_dict'] = Offers_dict            
         if 'Offers_dict' in st.session_state:
             Offers_dict = st.session_state["Offers_dict"]
         if 'new offers' in st.session_state:
@@ -259,7 +323,16 @@ if "password" in st.session_state:
         Offers_dict['long term'] = lt
         Offers_dict['reduc1'] = reduc
         Offers_dict['reduc2'] = reduc2
-        
+        combination = {
+        "senior_combin": False,
+        "long term_combin": False,
+        "reduction_combin": False,
+        "reduction2_combin": False
+        }
+        # if 'Combin_dict' in st.session_state:
+        #     Combin_dict = st.session_state['Combin_dict']
+            
+    
         Combin_dict = {
         "senior_combin": False,
         "long term_combin": False,
@@ -268,33 +341,62 @@ if "password" in st.session_state:
         }
         # Here we see if offers are combined or not
             
+        variables = {
+            "senior": senior,
+            "long term": lt,
+            "reduction": reduc,
+            "reduction2": reduc2
+        }
+        if selected_setting is not None:
+            Combin_dict = com_dict[selected_setting]
+
         selected = [senior,lt,reduc,reduc2]
         if (eb1) and any(selected):    
+            "***"
+            column1,column2 = st.columns([1,3])
+                
+            # Combinations
+            column1.markdown("""
+                    <h1 style='text-align: center; margin-bottom: 0px; font-family: "Roboto", sans-serif; font-size: 25px; font-weight: bold;'>
+                    Combinations
+                    </h1>
+                """, unsafe_allow_html=True
+                )
             form_c = st.form("Combinations")
             
 
-            variables = {
-                "senior": senior,
-                "long term": lt,
-                "reduction": reduc,
-                "reduction2": reduc2
-            }
-
             for var_name, value in variables.items():
                 if value:
-                    Combin_dict[str((var_name) + "_combin")] = form_c.checkbox("Early booking combined with " + var_name,key= str((var_name) + "_combin"))
+                    if selected_setting is not None:
+                        combination[str((var_name) + "_combin")] = form_c.checkbox("Early booking combined with " + var_name,key= str((var_name) + "hh"),value = Combin_dict[str((var_name) + "_combin")])
+                    elif "combination" in st.session_state:
+                        combination[str((var_name) + "_combin")] = form_c.checkbox("Early booking combined with " + var_name,key= str((var_name) + "hh"),value = st.session_state['combination'][str((var_name) + "_combin")])
+                    else:
+                        combination[str((var_name) + "_combin")] = form_c.checkbox("Early booking combined with " + var_name,key= str((var_name) + "hh"))
+                else:
+                    combination[str((var_name) + "_combin")] = False
+                st.session_state['combination'][str((var_name) + "_combin")] = combination
+                    
             form_c.form_submit_button()
-            
-            
+        st.session_state['combination'] = combination
+        st.session_state['Combin_dict'] = combination
         st.session_state['Offers_dict'] = Offers_dict
             
             
             
             
-            
+        "***"    
         # SPO *******************************************************************
         
-        
+        column1,column2 = st.columns([1,3])
+                
+        # Special Offers
+        column1.markdown("""
+                <h1 style='text-align: center; margin-bottom: 0px; font-family: "Roboto", sans-serif; font-size: 25px; font-weight: bold;'>
+                Special Offers
+                </h1>
+            """, unsafe_allow_html=True
+            )
         
         def spo_offers(i,Spo_dict,old,Offers_dict):
             eb1 = False
@@ -741,7 +843,69 @@ if "password" in st.session_state:
             
             
             "***"
-            # settings button
+            column1,column2 = st.columns([1,8.4])
+                
+            # Extra
+            column1.markdown("""
+                    <h1 style='text-align: center; margin-bottom: 0px; font-family: "Roboto", sans-serif; font-size: 25px; font-weight: bold;'>
+                    Reductions
+                    </h1>
+                """, unsafe_allow_html=True
+                )
+            
+            
+            # Dis_dict = {'red_per':list(),
+            #             'extra_amount':list(),
+            #             'type':list(),
+            #             'column':list()}
+            # all_dis_types = ['reduction','exced']
+            # if "Dis_dict" in st.session_state:
+            #     Dis_dict = st.session_state['Dis_dict']
+                
+            # if selected_setting is not None:
+            #     Dis_dict = e_dict[selected_setting]
+            #     Dis_dict['SPO'] = list()
+            
+            # for i in range(15):
+            #     red_number = "red"+str(i)
+            #     if(len(Dis_dict['column'])>=i+1):
+            #         old = True
+            #         if (selected_setting is not None):
+            #             dis_type = st.selectbox("Choose type",Dis_dict['type'][i])
+            #         elif ("Dis_dict" in st.session_state):
+            #             if (st.session_state['Dis_dict']['type'][i] is not None):
+            #                 dis_type = st.selectbox("Choose type",st.session_state['Dis_dict']['type'][i],key='11'*12)
+                            
+            #     else:
+            #         old = False
+            #         col_name = st.selectbox('Choose column',all_dis_types,key='11'*11)
+                    
+            #     if dis_type is None:
+            #         if len(Dis_dict['type'])>=i:
+            #             Dis_dict['type']=dis_type['type'][:i]
+            #         break
+            #     else:
+            #         if not old:
+            #             Dis_dict['type'].append(dis_type)
+            #         else:
+            #             Dis_dict['type'][i] = (dis_type)
+            #     cl1, cl2 = st.columns([1,2])
+            #     red_per = c11.checkbox("reduction percentage",key = "1w"*2,value=Dis_dict[i])
+            #     if not old:
+            #         Dis_dict['red_per'](red_per)       
+            #     else:
+            #         Dis_dict['red_per"'][i] = red_per
+            "***"
+            
+            column1,column2 = st.columns([1,2.5])
+                
+
+            column1.markdown("""
+                <h1 style='text-align: center; margin-bottom: 0px; font-family: "Roboto", sans-serif; font-size: 25px; font-weight: bold;'>
+                Add new custom
+                </h1>
+            """, unsafe_allow_html=True)
+
             user_input = st.text_input('settings name')
             apply_button = st.button("Add a new custom")
             
@@ -753,6 +917,8 @@ if "password" in st.session_state:
             file_path = "reductions.json"
             # save
             r_save_data = Offers_dict.copy()
+            spo_save_data = Spo_dict.copy()
+            
             if apply_button:
 
             
@@ -767,7 +933,6 @@ if "password" in st.session_state:
                     # if (r_save_data['end_date'] is not None) and not isinstance(r_save_data['eb2 date'], str):
                     #     r_save_data['end_date'] = r_save_data['end_date'].strftime("%Y-%m-%d")
                     
-                    
                     file_dict_save[user_input] = r_save_data
                     r_dict = {**old_file_dict, **file_dict_save}
                     
@@ -777,7 +942,6 @@ if "password" in st.session_state:
                     json.dump(r_dict, json_file)
 
                 # save
-                spo_save_data = Spo_dict.copy()
                 ssd1 = len(spo_save_data['eb1 date'])
                 ssd2 = len(spo_save_data['eb2 date'])
                 rs1 = len(spo_save_data['start_date'])
@@ -788,31 +952,43 @@ if "password" in st.session_state:
                         for i in range(len(spo_save_data)):
                             if i < ssd1:
                                 if spo_save_data['eb1 date'][i]:
-                                    spo_save_data['eb1 date'][i] = spo_save_data['eb1 date'][i].strftime("%Y-%m-%d")
+                                    if not(type(spo_save_data['eb1 date'][i]) == str):
+                                        spo_save_data['eb1 date'][i] = spo_save_data['eb1 date'][i].strftime("%Y-%m-%d")
                     if len(spo_save_data['eb2 date']) > 0:
                         for i in range(len(spo_save_data['eb2 date'])):
                             if i < ssd2:
                                 if spo_save_data['eb2 date'][i]:
-                                    spo_save_data['eb2 date'][i] = spo_save_data['eb2 date'][i].strftime("%Y-%m-%d")
+                                    if not(type(spo_save_data['eb2 date'][i]) == str):
+                                        spo_save_data['eb2 date'][i] = spo_save_data['eb2 date'][i].strftime("%Y-%m-%d")
                     if len(spo_save_data['start_date']) > 0:
                         for i in range(len(spo_save_data['start_date'])):
                             if i < rs1:
                                 if spo_save_data['start_date'][i]:
-                                    spo_save_data['start_date'][i] = spo_save_data['start_date'][i].strftime("%Y-%m-%d")
+                                    if not(type(spo_save_data['start_date'][i]) == str):
+                                        spo_save_data['start_date'][i] = spo_save_data['start_date'][i].strftime("%Y-%m-%d")
                     if len(spo_save_data['end_date']) > 0:
                         for i in range(len(spo_save_data['end_date'])):
                             if i < rs2:
                                 if spo_save_data['end_date'][i]:
-                                    spo_save_data['end_date'][i] = spo_save_data['end_date'][i].strftime("%Y-%m-%d")
+                                    if not(type(spo_save_data['end_date'][i]) == str):
+                                        spo_save_data['end_date'][i] = spo_save_data['end_date'][i].strftime("%Y-%m-%d")
                     if "SPO" in spo_save_data:
                         del spo_save_data["SPO"]
-                    
                     file_dict_save = dict()
                     file_dict_save[user_input] = spo_save_data
                     s_dict = {**s_dict, **file_dict_save}
-
                 with open("spo.json", "w") as json_file:
-                    json.dump(s_dict, json_file)
+                    json.dump(s_dict, json_file)    
+                    
+                    
+                    if len(user_input) > 0:
+                        
+                        file_dict_save = dict()
+                        file_dict_save[user_input] = combination
+                        com_dict = {**com_dict, **file_dict_save}
+
+                with open("combinations.json", "w") as json_file:
+                    json.dump(com_dict, json_file)
                         
 
 else:
