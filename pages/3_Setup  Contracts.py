@@ -107,28 +107,28 @@ if "password" in st.session_state:
             print(f"SPO_An error occurred: {e}")
             
     
-        # file_path = "extra.json"
+        file_path = "extra.json"
         
         
-        # try:
-        #     with open(file_path, 'r') as json_file:
-        #         # Attempt to load the JSON content
-        #         try:
-        #             load_dict = json.load(json_file)
-        #             # Check if the loaded data structure is not empty
-        #             if load_dict:
-        #                 e_dict = load_dict
-        #                 print("SPO_JSON file is not empty.")
-        #             else:
-        #                 e_dict = dict()
-        #                 print("SPO_JSON file is empty.")
-        #         except json.JSONDecodeError as e:
-        #             e_dict = dict()
-        #             print(f"SPO_File '{file_path}' contains invalid JSON: {e}")
-        # except FileNotFoundError:
-        #     print(f"SPO_File '{file_path}' not found.")
-        # except Exception as e:
-        #     print(f"SPO_An error occurred: {e}")
+        try:
+            with open(file_path, 'r') as json_file:
+                # Attempt to load the JSON content
+                try:
+                    load_dict = json.load(json_file)
+                    # Check if the loaded data structure is not empty
+                    if load_dict:
+                        e_dict = load_dict
+                        print("SPO_JSON file is not empty.")
+                    else:
+                        e_dict = dict()
+                        print("SPO_JSON file is empty.")
+                except json.JSONDecodeError as e:
+                    e_dict = dict()
+                    print(f"SPO_File '{file_path}' contains invalid JSON: {e}")
+        except FileNotFoundError:
+            print(f"SPO_File '{file_path}' not found.")
+        except Exception as e:
+            print(f"SPO_An error occurred: {e}")
 
         def delete_dictionary_from_json(file_path, key_to_delete):
             try:
@@ -183,8 +183,12 @@ if "password" in st.session_state:
             if delete:
                 delete_dictionary_from_json("spo.json",selected_setting)
                 delete_dictionary_from_json("reductions.json",selected_setting)
+                delete_dictionary_from_json("extra.json",selected_setting)
+                delete_dictionary_from_json("combinations.json",selected_setting)
                 del red_dict[selected_setting]
                 del s_dict[selected_setting]
+                del e_dict[selected_setting]
+                del com_dict[selected_setting]
                 selected_setting = None
                 st.experimental_rerun()
         old_file_dict = red_dict
@@ -854,47 +858,93 @@ if "password" in st.session_state:
                 )
             
             
-            # Dis_dict = {'red_per':list(),
-            #             'extra_amount':list(),
-            #             'type':list(),
-            #             'column':list()}
-            # all_dis_types = ['reduction','exced']
-            # if "Dis_dict" in st.session_state:
-            #     Dis_dict = st.session_state['Dis_dict']
+            Dis_dict = {'amount':list(),
+                        'type':list(),
+                        'days':list(),
+                        'column':list()}
+            all_dis_types = [None,'reduction','rise']
                 
-            # if selected_setting is not None:
-            #     Dis_dict = e_dict[selected_setting]
-            #     Dis_dict['SPO'] = list()
+            if selected_setting is not None:
+                st.write(e_dict)
+                
+                Dis_dict = e_dict[selected_setting]
+            statment = pd.read_excel(st.session_state["uploaded file"],sheet_name='statment')
             
-            # for i in range(15):
-            #     red_number = "red"+str(i)
-            #     if(len(Dis_dict['column'])>=i+1):
-            #         old = True
-            #         if (selected_setting is not None):
-            #             dis_type = st.selectbox("Choose type",Dis_dict['type'][i])
-            #         elif ("Dis_dict" in st.session_state):
-            #             if (st.session_state['Dis_dict']['type'][i] is not None):
-            #                 dis_type = st.selectbox("Choose type",st.session_state['Dis_dict']['type'][i],key='11'*12)
-                            
-            #     else:
-            #         old = False
-            #         col_name = st.selectbox('Choose column',all_dis_types,key='11'*11)
+            for i in range(15):
+                red_number = "red"+str(i)
+                if(len(Dis_dict['type'])>=i+1):
+                    old = True
                     
-            #     if dis_type is None:
-            #         if len(Dis_dict['type'])>=i:
-            #             Dis_dict['type']=dis_type['type'][:i]
-            #         break
-            #     else:
-            #         if not old:
-            #             Dis_dict['type'].append(dis_type)
-            #         else:
-            #             Dis_dict['type'][i] = (dis_type)
-            #     cl1, cl2 = st.columns([1,2])
-            #     red_per = c11.checkbox("reduction percentage",key = "1w"*2,value=Dis_dict[i])
-            #     if not old:
-            #         Dis_dict['red_per'](red_per)       
-            #     else:
-            #         Dis_dict['red_per"'][i] = red_per
+                    if (selected_setting is not None):
+                        if (Dis_dict['type'][i] is not None):
+                            index = all_dis_types.index(Dis_dict['type'][i])
+                        
+                    elif ("Dis_dict" in st.session_state):
+                        if (Dis_dict['type'][i] is not None):
+                            index = all_dis_types.index(st.session_state['Dis_dict']['type'][i])
+                            
+                    dis_type = st.selectbox("Choose the type of change " + str(i+1),all_dis_types,index=index,key='121'*(12+i))
+                            
+                else:
+                    old = False
+                    dis_type = st.selectbox("Choose the type of change " + str(i+1),all_dis_types,key='101'*(10+i))
+                    
+                if dis_type is None:
+                    if len(Dis_dict['type'])>=i:
+                        Dis_dict['type']=Dis_dict['type'][:i]
+                    break
+                
+                if not old:
+                    Dis_dict['type'].append(dis_type)
+                else:
+                    Dis_dict['type'][i] = (dis_type)
+                if dis_type is not None:
+                    
+                    if all_dis_types.index(dis_type) == 1:
+                        text = "reduction percentage"
+                        cl1, cl2 = st.columns([1,2])
+                    elif all_dis_types.index(dis_type) == 2:
+                        text = "Rise amount"
+                        cl1, cl2, cl3 = st.columns([1,2,2])
+                    if (len(Dis_dict['type'])>= i+1) and (len(Dis_dict['column'])>= i+1):
+                        if selected_setting is not None:
+                            amount_val = Dis_dict['amount'][i]
+                            days_val = Dis_dict['days'][i]
+                                
+                            index = list(statment.columns.insert(0,None)).index(Dis_dict['column'][i])
+                        elif 'Dis_dict' in st.session_state:
+                                amount_val = st.session_state['Dis_dict']['amount'][i]
+                                days_val = st.session_state['Dis_dict']['days'][i]
+                                index = list(statment.columns.insert(0,None)).index(st.session_state['Dis_dict']['column'][i])
+                        amount = float(cl1.text_input(text,amount_val,key = "1w"*(2+i)))
+                        if all_dis_types.index(dis_type) == 2:
+                            days = float(cl3.text_input('Minimum days',days_val,key = "1w"*(12+i)))
+                        else:
+                            days = 0
+                        column = cl2.selectbox("Please select the column for the action",statment.columns.insert(0,None),index = index,key = 'aa'*(i+1))    
+                    else:
+                        amount = float(cl1.text_input(text,0,key = "1w"*(2+i*3)))
+                        if all_dis_types.index(dis_type) == 2:
+                            days = float(cl3.text_input('Minimum days',7,key = "1w"*(2+i+i*3+9)))
+                        column = cl2.selectbox("Please select the column for the action",statment.columns.insert(0,None),key = 'aa'*(i+1))
+                    
+                    if not old:
+                        Dis_dict['amount'].append(amount)
+                        Dis_dict['column'].append(column)
+                        if all_dis_types.index(dis_type) == 2:
+                            Dis_dict['days'].append(days)
+                        else:
+                            Dis_dict['days'].append(0)
+                    else:
+                        Dis_dict['amount'][i] = amount
+                        Dis_dict['column'][i] = column
+                        if all_dis_types.index(dis_type) == 2:
+                            Dis_dict['days'][i] = days
+                        else:
+                            Dis_dict['days'][i] = 0
+                st.divider()
+            st.session_state['Dis_dict'] = Dis_dict
+            
             "***"
             
             column1,column2 = st.columns([1,2.5])
@@ -934,6 +984,11 @@ if "password" in st.session_state:
                     #     r_save_data['end_date'] = r_save_data['end_date'].strftime("%Y-%m-%d")
                     
                     file_dict_save[user_input] = r_save_data
+                    for key in old_file_dict.keys():
+                        if (old_file_dict[key]['eb1 date'] is not None) and not isinstance(old_file_dict[key]['eb1 date'], str):
+                            old_file_dict[key]['eb1 date'] = old_file_dict[key]['eb1 date'].strftime("%Y-%m-%d")
+                        if (old_file_dict[key]['eb2 date'] is not None) and not isinstance(old_file_dict[key]['eb2 date'], str):
+                            old_file_dict[key]['eb2 date'] = old_file_dict[key]['eb2 date'].strftime("%Y-%m-%d")
                     r_dict = {**old_file_dict, **file_dict_save}
                     
 
@@ -980,16 +1035,24 @@ if "password" in st.session_state:
                 with open("spo.json", "w") as json_file:
                     json.dump(s_dict, json_file)    
                     
+                
+                if len(user_input) > 0:
                     
-                    if len(user_input) > 0:
-                        
-                        file_dict_save = dict()
-                        file_dict_save[user_input] = combination
-                        com_dict = {**com_dict, **file_dict_save}
+                    file_dict_save = dict()
+                    file_dict_save[user_input] = combination
+                    com_dict = {**com_dict, **file_dict_save}
 
-                with open("combinations.json", "w") as json_file:
-                    json.dump(com_dict, json_file)
+                    with open("combinations.json", "w") as json_file:
+                        json.dump(com_dict, json_file)
                         
+                if len(user_input) > 0:
+                    
+                    file_dict_save = dict()
+                    file_dict_save[user_input] = Dis_dict
+                    e_dict = {**e_dict, **file_dict_save}
+
+                    with open("extra.json", "w") as json_file:
+                        json.dump(e_dict, json_file)                     
 
 else:
     

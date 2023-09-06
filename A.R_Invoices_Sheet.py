@@ -625,7 +625,7 @@ elif password == ps:
                 # Early booking 2
                 if "eb2" in Offers_dict:
                     if Offers_dict["eb2"]:
-                        if (statment["Res_date"][i] <= Offers_dict["eb2 date"] and statment["Res_date"][i] > Offers_dict["eb1 date"]):
+                        if (statment["Res_date"][i] <= pd.Timestamp(Offers_dict["eb2 date"]) and statment["Res_date"][i] > pd.Timestamp(Offers_dict["eb1 date"])):
                             F_eb2()
                             
                 if "FormSubmitter:Combinations-Submit" in st.session_state:
@@ -808,11 +808,12 @@ elif password == ps:
                                 price = offer_con(price,Offers_dict['reduc2 percentage'])
 
             return price
-        
+        all_dis_types = [None,'reduction','rise']
+        numeric_pattern = r'^[+-]?(\d*\.\d+|\d+(,\d{3})*|\d+)$'
         if "Spo_dict" in st.session_state:
             Spo_dict = st.session_state["Spo_dict"]
-            if len(Spo_dict["name"]) > 0:
-                for guest in range(len(statment['Arrival'])):
+            for guest in range(len(statment['Arrival'])):
+                if len(Spo_dict["name"]) > 0:
                     passing = False
                     cnt = 0
                     for spo_num in reversed(range(len(Spo_dict["name"]))):
@@ -919,6 +920,42 @@ elif password == ps:
                                             night_price = spo_arrival_df[rate_code][1]
                                             nights = statment["Departure"][guest] - statment["Arrival"][guest]
                                             statment["Total price currency"][guest] += float(night_price * nights.days)
+                # Reductions
+                if "Dis_dict" in st.session_state:
+                    Dis_dict = st.session_state["Dis_dict"]
+                    for i in range(len(Dis_dict['type'])):
+                        if all_dis_types.index(Dis_dict['type'][i])==1:
+                            Dis_dict['amount'][i] = -(Dis_dict['amount'][i]/100) * statment["Total price currency"][guest]
+                        elif all_dis_types.index(Dis_dict['type'][i])==2:
+                            pass
+                        if Dis_dict['column'][i] is None:
+                            statment["Total price currency"][guest] += (Dis_dict['amount'][i])
+                        elif statment[Dis_dict['column'][i]].str.contains('yes', case=False, na=False):
+                            if statment[Dis_dict['column'][i]][guest].lower() == 'yes':
+                                statment["Total price currency"][guest] += (Dis_dict['amount'][i])
+                        elif statment[Dis_dict]['column'][i].str.match(numeric_pattern, na=False):
+                            statment["Total price currency"][guest] += float(statment[Dis_dict['column'][i]][guest]) * Dis_dict['amount'][i]
+                            
+                        else:
+                            if (statment[Dis_dict['column'][i]].str.contains(statment["Rate code"][guest], case=False, na=False)):
+                                Type_of_room = statment["Rate code"][guest][0].lower()
+                                
+                                # adjusting room type
+                                
+                                type_of_room_mapping = {
+                                    "s": 1,
+                                    "d": 2,
+                                    "t": 3,
+                                    "q": 4
+                                }
+
+                                if Type_of_room in type_of_room_mapping:
+                                    mapped_value = type_of_room_mapping[Type_of_room]
+                                    statment["Total price currency"][guest] += mapped_value * Dis_dict['amount'][i]
+                            else:
+                                    statment["Total price currency"][guest] += statment[Dis_dict['column'][i]][guest] * Dis_dict['amount'][i]
+                                
+                            
                                  
                 
                             
@@ -935,7 +972,15 @@ elif password == ps:
                 statment["Total price LE"] = statment["Total price currency"] * statment["Currency rate"]         
                 statment["Difference Hotel Currency LE"] = statment["Total price LE"] -  statment["Invoice Amount L.E"] 
                 statment['Difference Hotel Currency LE'] = statment['Difference Hotel Currency LE'].round(1)
-          
+        
+        
+        
+        if "Dis_dict" in st.session_state:
+            Dis_dict = st.session_state["Dis_dict"]
+            for i in range(len(Dis_dict['type'])):
+                if all_dis_types.index(Dis_dict['type'][i])==1:
+                    Dis_dict['amount'][i] = -Dis_dict['amount'][i]
+                    
         # @st.cache_data
         # def convert_df(df):
         #     # IMPORTANT: Cache the conversion to prevent computation on every rerun
