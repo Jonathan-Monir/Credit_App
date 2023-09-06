@@ -930,14 +930,15 @@ elif password == ps:
                             pass
                         if Dis_dict['column'][i] is None:
                             statment["Total price currency"][guest] += (Dis_dict['amount'][i])
-                        elif statment[Dis_dict['column'][i]].str.contains('yes', case=False, na=False):
-                            if statment[Dis_dict['column'][i]][guest].lower() == 'yes':
+                        elif statment[Dis_dict['column'][i]][guest].lower() == 'yes':
                                 statment["Total price currency"][guest] += (Dis_dict['amount'][i])
-                        elif statment[Dis_dict]['column'][i].str.match(numeric_pattern, na=False):
+                        elif statment[Dis_dict['column'][i]][guest].lower() == 'no':
+                                continue
+                        elif all(statment[Dis_dict['column'][i]].str.match(numeric_pattern, na=False)):
                             statment["Total price currency"][guest] += float(statment[Dis_dict['column'][i]][guest]) * Dis_dict['amount'][i]
                             
                         else:
-                            if (statment[Dis_dict['column'][i]].str.contains(statment["Rate code"][guest], case=False, na=False)):
+                            if any((statment[Dis_dict['column'][i]].str.contains(statment["Rate code"][guest], case=False, na=False))):
                                 Type_of_room = statment["Rate code"][guest][0].lower()
                                 
                                 # adjusting room type
