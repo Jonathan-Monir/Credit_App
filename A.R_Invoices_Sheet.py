@@ -9,9 +9,6 @@ import warnings
 # Add this line at the beginning of your script or function to ignore the warning
 pd.options.mode.chained_assignment = None
 
-# Initializing offers in st.session_state
-# st.session_state["senior"] = None
-# st.session_state["senior and early booking"] = None
 
 
 # Add this line at the end of your script or function to re-enable the warning
@@ -591,12 +588,18 @@ elif password == ps:
         # Here are the other new offers
         if "Offers_dict" in st.session_state:
             Offers_dict = st.session_state["Offers_dict"]
+            
+            if "senior" in Offers_dict:
+                if Offers_dict["senior"]:
+                    sen_column = st.selectbox('please select senior column',options=statment.columns.insert(0,None))
+                    
+                            
             for i in range(len(statment["Arrival"])):
                 
                 # senior
                 if "senior" in Offers_dict:
-                    if Offers_dict["senior"] and ("senior" in statment.columns):
-                        if (statment["Senior No."][i] >0) :
+                    if Offers_dict["senior"] and (sen_column in statment.columns):
+                        if (statment[sen_column][i] >0) :
                             Type_of_room = statment["Rate code"][i][0].lower()
                             
                             # adjusting room type
@@ -612,7 +615,7 @@ elif password == ps:
                                 mapped_value = type_of_room_mapping[Type_of_room]
 
                             
-                            Total_price = statment["Total price currency"][i] * (statment["Senior No."][i]/int(mapped_value)) * -(Offers_dict["senior percentage"]/100)
+                            Total_price = statment["Total price currency"][i] * (statment[sen_column][i]/int(mapped_value)) * -(Offers_dict["senior percentage"]/100)
                             statment["Total price currency"][i] += Total_price
                             
                             
@@ -678,9 +681,10 @@ elif password == ps:
                 return False
             
         def csenior(cell,Spo_dict):
-            if "Senior No." in statment.columns:
-                if Spo_dict['senior'][spo_num]:
-                    return (Spo_dict['senior'][spo_num]) and (cell["Senior No."] > 0)
+            if sen_column not in statment.columns:
+                sen_column = st.selectbox('please select senior column',options=statment.columns.insert(0,None))
+            if Spo_dict['senior'][spo_num]:
+                return (Spo_dict['senior'][spo_num]) and (cell[sen_column] > 0)
             else:
                 return False
             
@@ -719,7 +723,7 @@ elif password == ps:
                 if Type_of_room in type_of_room_mapping:
                                 mapped_value = type_of_room_mapping[Type_of_room]
                                 
-                price = price * (1-(statment["Senior No."][i]/int(mapped_value)) * -(Spo_dict["senior percentage"][spo_num]/100))
+                price = price * (1-(statment[sen_column][i]/int(mapped_value)) * -(Spo_dict["senior percentage"][spo_num]/100))
                 
             if clt(cell,Spo_dict):
                 price = price * (1 - (Spo_dict['lt percentage'][spo_num]/100))
@@ -753,7 +757,7 @@ elif password == ps:
             #senior
             if "senior" in Offers_dict:
                 if Offers_dict["senior"]:
-                    if cell["Senior No."] >0:
+                    if cell[sen_column] >0:
                         Type_of_room = cell["Rate code"][0].lower()
                         
                         # adjusting room type
@@ -769,7 +773,7 @@ elif password == ps:
                             mapped_value = type_of_room_mapping[Type_of_room]
 
                         
-                        Total_price = price * (cell["Senior No."]/int(mapped_value)) * -(Offers_dict["senior percentage"]/100)
+                        Total_price = price * (cell[sen_column]/int(mapped_value)) * -(Offers_dict["senior percentage"]/100)
                         price += Total_price
                         
                         
@@ -923,19 +927,23 @@ elif password == ps:
                 # Reductions
                 if "Dis_dict" in st.session_state:
                     Dis_dict = st.session_state["Dis_dict"]
+                    
                     for i in range(len(Dis_dict['type'])):
+                        Dis_dict_edit = Dis_dict.copy()
                         if all_dis_types.index(Dis_dict['type'][i])==1:
-                            Dis_dict['amount'][i] = -(Dis_dict['amount'][i]/100) * statment["Total price currency"][guest]
+                            price = -(Dis_dict['amount'][i]/100) * statment["Total price currency"][guest]
+                            
                         elif all_dis_types.index(Dis_dict['type'][i])==2:
-                            pass
+                            price = Dis_dict['amount'][i]
+                            
                         if Dis_dict['column'][i] is None:
-                            statment["Total price currency"][guest] += (Dis_dict['amount'][i])
+                            statment["Total price currency"][guest] += (price)
                         elif statment[Dis_dict['column'][i]][guest].lower() == 'yes':
-                                statment["Total price currency"][guest] += (Dis_dict['amount'][i])
+                            statment["Total price currency"][guest] += (price)
                         elif statment[Dis_dict['column'][i]][guest].lower() == 'no':
-                                continue
+                            continue
                         elif all(statment[Dis_dict['column'][i]].str.match(numeric_pattern, na=False)):
-                            statment["Total price currency"][guest] += float(statment[Dis_dict['column'][i]][guest]) * Dis_dict['amount'][i]
+                            statment["Total price currency"][guest] += float(statment[Dis_dict['column'][i]][guest]) * price
                             
                         else:
                             if any((statment[Dis_dict['column'][i]].str.contains(statment["Rate code"][guest], case=False, na=False))):
@@ -952,9 +960,10 @@ elif password == ps:
 
                                 if Type_of_room in type_of_room_mapping:
                                     mapped_value = type_of_room_mapping[Type_of_room]
-                                    statment["Total price currency"][guest] += mapped_value * Dis_dict['amount'][i]
+                                    statment["Total price currency"][guest] += mapped_value * price
                             else:
-                                    statment["Total price currency"][guest] += statment[Dis_dict['column'][i]][guest] * Dis_dict['amount'][i]
+                                    statment["Total price currency"][guest] += statment[Dis_dict['column'][i]][guest] * price
+                        
                                 
                             
                                  
@@ -976,11 +985,6 @@ elif password == ps:
         
         
         
-        if "Dis_dict" in st.session_state:
-            Dis_dict = st.session_state["Dis_dict"]
-            for i in range(len(Dis_dict['type'])):
-                if all_dis_types.index(Dis_dict['type'][i])==1:
-                    Dis_dict['amount'][i] = -Dis_dict['amount'][i]
                     
         # @st.cache_data
         # def convert_df(df):

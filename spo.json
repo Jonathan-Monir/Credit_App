@@ -1,1 +1,92 @@
-{"null": {"name": [], "eb1": [], "eb1 percentage": [], "eb1 date": [], "eb2": [], "eb2 date": [], "eb2 percentage": [], "count": [], "SPO": [], "senior": [], "senior percentage": [], "long term": [], "lt days": [], "lt percentage": [], "reduc1": [], "reduc2": [], "reduc1 percentage": [], "reduc2 percentage": [], "start_date": [], "end_date": []}, "bigg": {"name": ["SPO 07.12 TO 15.12 (2)", "SPO 07.12 TO 15.12 (1)"], "eb1": [true, true, true], "eb1 percentage": [0.0, 0.0, 0.0], "eb1 date": ["2023-09-06", "2023-09-06", "2023-09-06"], "eb2": [true, true, true], "eb2 date": ["2023-09-06", "2023-09-06", "2023-09-06"], "eb2 percentage": [0.0, 0.0, 0.0], "count": 2, "senior": [true, true, true], "senior percentage": [0.0, 0.0, 0.0], "long term": [true, true, true], "lt days": [28, 28, 28], "lt percentage": [0.0, 0.0, 0.0], "reduc1": [true, true, true], "reduc2": [true, true, true], "reduc1 percentage": [0.0, 0.0, 0.0], "reduc2 percentage": [0.0, 0.0, 0.0], "start_date": ["2023-09-01", "2023-05-01"], "end_date": ["2023-10-31", "2023-06-30"]}}
+{
+    "bigg": {
+        "name": [
+            "SPO 07.12 TO 15.12 (2)",
+            "SPO 07.12 TO 15.12 (1)"
+        ],
+        "eb1": [
+            true,
+            true,
+            true
+        ],
+        "eb1 percentage": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "eb1 date": [
+            "2023-09-06",
+            "2023-09-06",
+            "2023-09-06"
+        ],
+        "eb2": [
+            true,
+            true,
+            true
+        ],
+        "eb2 date": [
+            "2023-09-06",
+            "2023-09-06",
+            "2023-09-06"
+        ],
+        "eb2 percentage": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "count": 2,
+        "senior": [
+            true,
+            true,
+            true
+        ],
+        "senior percentage": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "long term": [
+            true,
+            true,
+            true
+        ],
+        "lt days": [
+            28,
+            28,
+            28
+        ],
+        "lt percentage": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "reduc1": [
+            true,
+            true,
+            true
+        ],
+        "reduc2": [
+            true,
+            true,
+            true
+        ],
+        "reduc1 percentage": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "reduc2 percentage": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "start_date": [
+            "2023-09-01",
+            "2023-05-01"
+        ],
+        "end_date": [
+            "2023-10-31",
+            "2023-06-30"
+        ]
+    }
+}
