@@ -1,1 +1,8 @@
-{"bigg": {"amount": [10.0, 10.0], "type": ["reduction", "rise"], "days": [0, 7.0], "column": ["Rate code", "Rate code"]}}
+{
+    "Hotel ABC": {
+        "amount": [],
+        "type": [],
+        "days": [],
+        "column": []
+    }
+}

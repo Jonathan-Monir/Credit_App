@@ -865,9 +865,8 @@ if "password" in st.session_state:
             all_dis_types = [None,'reduction','rise']
                 
             if selected_setting is not None:
-                st.write(e_dict)
-                
                 Dis_dict = e_dict[selected_setting]
+                
             statment = pd.read_excel(st.session_state["uploaded file"],sheet_name='statment')
             
             for i in range(15):

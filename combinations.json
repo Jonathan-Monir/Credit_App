@@ -1,1 +1,8 @@
-{"bigg": {"senior_combin": true, "long term_combin": true, "reduction_combin": true, "reduction2_combin": true}}
+{
+    "Hotel ABC": {
+        "senior_combin": true,
+        "long term_combin": false,
+        "reduction_combin": true,
+        "reduction2_combin": false
+    }
+}
