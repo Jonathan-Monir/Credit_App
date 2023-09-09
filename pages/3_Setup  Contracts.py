@@ -22,6 +22,24 @@ st.markdown("""
     </h1>
 """, unsafe_allow_html=True
 )
+def convert_dates_to_strings(data):
+    if isinstance(data, dict):
+        for key, value in data.items():
+            data[key] = convert_dates_to_strings(value)
+    elif isinstance(data, list):
+        for i in range(len(data)):
+            data[i] = convert_dates_to_strings(data[i])
+    elif isinstance(data, datetime.date) or isinstance(data, datetime.datetime):
+        return data.strftime("%Y-%m-%d %H:%M:%S")  # Customize the format as needed
+    return data
+
+def remove_spo_key(d):
+    for key in list(d.keys()):
+        for sub_key in list(d[key].keys()):
+            if d[key][sub_key] == "SPO":
+                del d[key][sub_key] 
+    return d
+
 if "password" in st.session_state:
     if st.session_state["password"] != ps:
         st.markdown("""
@@ -968,6 +986,9 @@ if "password" in st.session_state:
             r_save_data = Offers_dict.copy()
             spo_save_data = Spo_dict.copy()
             
+            
+            # end
+            
             if apply_button:
 
             
@@ -989,7 +1010,7 @@ if "password" in st.session_state:
                         if (old_file_dict[key]['eb2 date'] is not None) and not isinstance(old_file_dict[key]['eb2 date'], str):
                             old_file_dict[key]['eb2 date'] = old_file_dict[key]['eb2 date'].strftime("%Y-%m-%d")
                     r_dict = {**old_file_dict, **file_dict_save}
-                    
+                    convert_dates_to_strings(r_dict)
 
                 
                 with open(file_path, "w") as json_file:
@@ -1031,6 +1052,10 @@ if "password" in st.session_state:
                     file_dict_save = dict()
                     file_dict_save[user_input] = spo_save_data
                     s_dict = {**s_dict, **file_dict_save}
+                    s_dict = convert_dates_to_strings(s_dict)
+                    
+                    s_dict = remove_spo_key(s_dict)
+                    
                 with open("spo.json", "w") as json_file:
                     json.dump(s_dict, json_file)    
                     

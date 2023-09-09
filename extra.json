@@ -1,8 +1,1 @@
-{
-    "Hotel ABC": {
-        "amount": [],
-        "type": [],
-        "days": [],
-        "column": []
-    }
-}
+{"Hotel ABC": {"amount": [], "type": [], "days": [], "column": []}}

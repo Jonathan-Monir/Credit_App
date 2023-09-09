@@ -1,8 +1,1 @@
-{
-    "Hotel ABC": {
-        "senior_combin": true,
-        "long term_combin": false,
-        "reduction_combin": true,
-        "reduction2_combin": false
-    }
-}
+{"Hotel ABC": {"senior_combin": true, "long term_combin": false, "reduction_combin": true, "reduction2_combin": false}, "7amada": {"senior_combin": true, "long term_combin": false, "reduction_combin": true, "reduction2_combin": false}}
