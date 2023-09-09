@@ -36,7 +36,7 @@ def convert_dates_to_strings(data):
 def remove_spo_key(d):
     for key in list(d.keys()):
         for sub_key in list(d[key].keys()):
-            if d[key][sub_key] == "SPO":
+            if sub_key == "SPO":
                 del d[key][sub_key] 
     return d
 
@@ -210,7 +210,8 @@ if "password" in st.session_state:
                 selected_setting = None
                 st.experimental_rerun()
         old_file_dict = red_dict
-                
+        
+           
         column1,column2 = st.columns([1,3.5])
                 
         # Recuctions
@@ -1076,7 +1077,21 @@ if "password" in st.session_state:
                     e_dict = {**e_dict, **file_dict_save}
 
                     with open("extra.json", "w") as json_file:
-                        json.dump(e_dict, json_file)                     
+                        json.dump(e_dict, json_file)     
+        # dicts = [red_dict,s_dict,com_dict,e_dict]
+        # # download json
+        # for i in dicts:
+        #     i = convert_dates_to_strings(i)
+        #     i = remove_spo_key(i)
+        #     json_string = json.dumps(i)
+        #     # st.json(json_string, expanded=True)
+
+        #     st.download_button(
+        #         label="Download JSON",
+        #         file_name="data.json",
+        #         mime="application/json",
+        #         data=json_string,
+        #     )                     
 
 else:
     
