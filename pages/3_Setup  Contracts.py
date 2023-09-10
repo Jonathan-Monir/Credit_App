@@ -9,7 +9,6 @@ from PIL import Image
 import streamlit as st
 import warnings
 import datetime
-
 current_date = datetime.date.today()
 formatted_date = current_date.strftime('%d-%m-%Y')
 

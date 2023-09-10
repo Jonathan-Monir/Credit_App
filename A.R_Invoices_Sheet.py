@@ -159,7 +159,6 @@ elif password == ps:
         first_row = statment.iloc[0]
         num_nan = first_row.isnull().sum()
         shifted = False
-        print(statment.info())
         # Get the number of null values in each row
         statment = statment [~statment['Arrival'].isnull()]
         
@@ -232,8 +231,8 @@ elif password == ps:
                 
                 
                 Summing=0
-                date_arrival = statment["Arrival"][i]
-                date_departure = statment["Departure"][i] 
+                date_arrival = statment.loc[i, "Arrival"]
+                date_departure = statment.loc[i, "Departure"]
 
                 rate_code = statment["Rate code"][i]
                 arrival_row = con[(con["first date"]<=date_arrival) & (con["second date"]>=date_arrival)]
@@ -321,8 +320,8 @@ elif password == ps:
             
             for i in range(len(statment["Arrival"])): # loop
                 Summing=0
-                date_arrival = statment["Arrival"][i]
-                date_departure = statment["Departure"][i] - timedelta(1)
+                date_arrival = statment.loc[i, "Arrival"]
+                date_departure = statment.loc[i, "Departure"] - timedelta(1)
 
                 res_date = statment["Res_date"][i]
                 rate_code = statment["Rate code"][i]
@@ -453,8 +452,8 @@ elif password == ps:
                     first_day_spo2 = spo2["first date"][0]
                     last_day_spo2 = spo2["second date"].iloc[-1]
                     if  res_date >= first_day_spo2 and res_date <= last_day_spo2:
-                        date_arrival = statment["Arrival"][i]
-                        date_departure = statment["Departure"][i] - timedelta(1)
+                        date_arrival = statment.loc[i, "Arrival"]
+                        date_departure = statment.loc[i, "Departure"] - timedelta(1)
 
                         res_date = statment["Res_date"][i]
                         rate_code = statment["Rate code"][i]
@@ -823,10 +822,10 @@ elif password == ps:
                                 Summing = 0
                                 first_day_spo2 = SPO["first date"][0]
                                 last_day_spo2 = SPO["second date"].iloc[-1]
-                                date_arrival = statment["Arrival"][guest]
+                                date_arrival = statment.loc[guest, "Arrival"]
                                 if passing:
                                     date_arrival = new_arrival
-                                date_departure = statment["Departure"][guest] - timedelta(1)
+                                date_departure = statment.loc[guest, "Departure"] - timedelta(1)
 
                                 
                                 res_date = statment["Res_date"][guest]
@@ -870,7 +869,7 @@ elif password == ps:
                                     new_arrival = last_day_spo2 + timedelta(days=1)
                                 else:
                                     date_arrival = last_day_spo2 + timedelta(days=1)
-                                    date_departure = statment["Departure"][guest] - timedelta(1)
+                                    date_departure = statment.loc[guest, "Departure"] - timedelta(1)
                                     arrival_row = con[(con["first date"]<=date_arrival) & (con["second date"]>=date_arrival)]
                 
                                     departure_row = con[(con["first date"]<=date_departure) & (con["second date"]>=date_departure)]
@@ -1193,4 +1192,3 @@ elif password == ps:
         # # Write the Excel file to the current filepath
         # with open(r"D:\vscoded\Excl\app V.0\SPO_app-win32-x64\Result sheet.xlsx", 'wb') as f:
         #     f.write(df_xlsx)
-print("done")
