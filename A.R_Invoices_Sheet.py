@@ -68,8 +68,9 @@ elif password == ps:
     elif st.session_state["uploaded file"] is None:
         uploaded_file = st.file_uploader("Choose a file")
         st.session_state["uploaded file"] = uploaded_file
-        
+
     else:
+        uploaded_file = st.file_uploader("Choose a file")
         uploaded_file = st.session_state["uploaded file"]
         
     if uploaded_file is not None:
