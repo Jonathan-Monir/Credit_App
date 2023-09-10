@@ -232,8 +232,8 @@ elif password == ps:
                 
                 
                 Summing=0
-                date_arrival = statment.loc[i, "Arrival"]
-                date_departure = statment.loc[i, "Departure"]
+                date_arrival = pd.Timestamp(statment.loc[i, "Arrival"])
+                date_departure = pd.Timestamp(statment.loc[i, "Departure"])
 
                 rate_code = statment["Rate code"][i]
                 arrival_row = con[(con["first date"]<=date_arrival) & (con["second date"]>=date_arrival)]
@@ -253,7 +253,7 @@ elif password == ps:
 
                 if date_departure <= date2_arrival:
                     price = float(price_arrival_night * ((date_departure-date_arrival).days))
-                    statment["Total price currency"][i] = price
+                    statment.loc[i, "Total price currency"] = price
                     
                 else:
                     date_range = con[(date_arrival<=con["second date"]) & (date_departure>=con["first date"])]
@@ -271,11 +271,11 @@ elif password == ps:
                         night_price = spo_arrival_df[rate_code][0]
                         
                         nights = statment["Departure"][i] - statment["Arrival"][i]
-                        statment["Total price currency"][i] = float(night_price * nights.days)
+                        statment.loc[i, "Total price currency"] = float(night_price * nights.days)
                     elif ((res_date >= spo_arrival_df["first date"][0]) and (res_date <= spo_arrival_df["second date"][0])) and ((date_arrival >= spo_arrival_df["first date"][1]) and (date_arrival <= spo_arrival_df["second date"][1])):
                         night_price = spo_arrival_df[rate_code][1]
                         nights = statment["Departure"][i] - statment["Arrival"][i]
-                        statment["Total price currency"][i] = float(night_price * nights.days)
+                        statment.loc[i, "Total price currency"] = float(night_price * nights.days)
                 
 
                     
@@ -292,8 +292,8 @@ elif password == ps:
             if "Total price currency" not in statment:
                 statment["Total price currency"]=0
             
-            first_day_spo = spo["first date"][0]
-            last_day_spo = spo["second date"].iloc[-1]
+            first_day_spo = pd.Timestamp(spo["first date"][0])
+            last_day_spo = pd.Timestamp(spo["second date"].iloc[-1])
             hide_checkbox_label_style = """
                 <style>
                     .checkbox-container .stCheckbox>label {
@@ -321,8 +321,8 @@ elif password == ps:
             
             for i in range(len(statment["Arrival"])): # loop
                 Summing=0
-                date_arrival = statment.loc[i, "Arrival"]
-                date_departure = statment.loc[i, "Departure"] - timedelta(1)
+                date_arrival = pd.Timestamp(statment.loc[i, "Arrival"])
+                date_departure = pd.Timestamp(statment.loc[i, "Departure"] - timedelta(1))
 
                 res_date = statment["Res_date"][i]
                 rate_code = statment["Rate code"][i]
@@ -342,7 +342,7 @@ elif password == ps:
                     
                     if date_departure <= date2_arrival:
                         price = float(price_arrival_night * ((date_departure-date_arrival).days +1))
-                        statment["Total price currency"][i] = price
+                        statment.loc[i, "Total price currency"] = price
                         
                     else:
                         date_range = con[(date_arrival<=con["first date"]) & (date_departure>=con["second date"])]
@@ -355,7 +355,7 @@ elif password == ps:
                             
                         other_price = (((date2_arrival-date_arrival).days+1) * (arrival_row[rate_code].values[0]) + ((date_departure-date1_departure).days+1) * (departure_row[rate_code].values[0]))
                         
-                        statment["Total price currency"][i] = Summing + other_price
+                        statment.loc[i, "Total price currency"] = Summing + other_price
                 else:
                     arrival_row = spo[(spo["first date"]<=date_arrival) & (spo["second date"]>=date_arrival)]
                     departure_row = spo[(spo["first date"]<=date_departure) & (spo["second date"]>=date_departure)]
@@ -372,7 +372,7 @@ elif password == ps:
                         
                         if date_departure <= date2_arrival:
                             price = price_arrival_night * ((date_departure-date_arrival).days +1)
-                            statment["Total price currency"][i] = price
+                            statment.loc[i, "Total price currency"] = price
                         else:
                             date_range = spo[(date_arrival<=spo["first date"]) & (date_departure>=spo["second date"])]
                             diff = (date_range["second date"] - date_range["first date"]).dt.days + 1
@@ -383,7 +383,7 @@ elif password == ps:
                             other_price = (((date2_arrival-date_arrival).days+1) * (arrival_row[rate_code].values[0]) + ((date_departure-date1_departure).days+1) * (departure_row[rate_code].values[0]))
                             
                             
-                            statment["Total price currency"][i] = Summing + other_price        
+                            statment.loc[i, "Total price currency"] = Summing + other_price        
                     else:
                         departure_row = spo[(spo["first date"]<=last_day_spo) & (spo["second date"]>=last_day_spo)]
 
@@ -434,17 +434,17 @@ elif password == ps:
                             
                             con_part_price = Summing + other_price
                             
-                        statment["Total price currency"][i]=con_part_price + spo_part_price
+                        statment.loc[i, "Total price currency"]=con_part_price + spo_part_price
                 if checked1:        
                     if res_date >= spo_arrival_df["first date"][0] and res_date <= spo_arrival_df["second date"][0]:
                         if date_arrival >= spo_arrival_df["first date"][0] and date_arrival <= spo_arrival_df["second date"][0]:
                             price_arrival_night = spo_arrival_df[rate_code][0]
                             price = price_arrival_night * ((date_departure-date_arrival).days +1)
-                            statment["Total price currency"][i] = price    
+                            statment.loc[i, "Total price currency"] = price    
                         if date_arrival >= spo_arrival_df["first date"][1] and date_arrival <= spo_arrival_df["second date"][1]:
                             price_arrival_night = spo_arrival_df[rate_code][1]
                             price = price_arrival_night * ((date_departure-date_arrival).days +1)
-                            statment["Total price currency"][i] = price
+                            statment.loc[i, "Total price currency"] = price
                     
 
                 if SPO2_name:
@@ -453,8 +453,8 @@ elif password == ps:
                     first_day_spo2 = spo2["first date"][0]
                     last_day_spo2 = spo2["second date"].iloc[-1]
                     if  res_date >= first_day_spo2 and res_date <= last_day_spo2:
-                        date_arrival = statment.loc[i, "Arrival"]
-                        date_departure = statment.loc[i, "Departure"] - timedelta(1)
+                        date_arrival = pd.Timestamp(statment.loc[i, "Arrival"])
+                        date_departure = pd.Timestamp(statment.loc[i, "Departure"]) - timedelta(1)
 
                         res_date = statment["Res_date"][i]
                         rate_code = statment["Rate code"][i]
@@ -472,7 +472,7 @@ elif password == ps:
                             
                             if date_departure <= date2_arrival:
                                 price = price_arrival_night * ((date_departure-date_arrival).days +1)
-                                statment["Total price currency"][i] = price
+                                statment.loc[i, "Total price currency"] = price
                             else:
                                 date_range = spo2[(date_arrival<=spo2["second date"]) & (date_departure>=spo2["first date"])]
                                 diff = (date_range["second date"] - date_range["first date"]).dt.days + 1
@@ -482,7 +482,7 @@ elif password == ps:
                                 other_price = (((date_arrival-date1_arrival).days) * (arrival_row[rate_code].values[0]) + ((date2_departure-date_departure).days) * (departure_row[rate_code].values[0]))
                                 
                                 
-                                statment["Total price currency"][i] = Summing - other_price      
+                                statment.loc[i, "Total price currency"] = Summing - other_price      
                                 # CONTINUE TO CONTRACT OR SPO HEREEEEE  
                         else:
                             departure_row = spo2[(spo2["first date"]<=last_day_spo) & (spo2["second date"]>=last_day_spo)]
@@ -535,27 +535,27 @@ elif password == ps:
                                 
                                 con_part_price = Summing + other_price
                                 
-                            statment["Total price currency"][i]=con_part_price + spo_part_price
+                            statment.loc[i, "Total price currency"] =con_part_price + spo_part_price
         
           
         # Functions
         def F_eb1():
-            statment["Total price currency"][i] -= (statment["Total price currency"][i] * (Offers_dict["eb1 percentage"]/100))  
+            statment.loc[i, "Total price currency"] -= (statment.loc[i, "Total price currency"] * (Offers_dict["eb1 percentage"]/100))  
             
         def F_eb2():
-            statment["Total price currency"][i] -= (statment["Total price currency"][i] * (Offers_dict["eb2 percentage"]/100))
+            statment.loc[i, "Total price currency"] -= (statment.loc[i, "Total price currency"] * (Offers_dict["eb2 percentage"]/100))
             
         def LT():
-            statment["Total price currency"][i] -= ((statment["Total price currency"][i] * (Offers_dict["lt percentage"]/100)))
+            statment.loc[i, "Total price currency"] -= ((statment.loc[i, "Total price currency"] * (Offers_dict["lt percentage"]/100)))
         
         def reduc():
-            statment["Total price currency"][i] -= ((statment["Total price currency"][i] * (Offers_dict["reduc percentage"]/100)))
+            statment.loc[i, "Total price currency"] -= ((statment.loc[i, "Total price currency"] * (Offers_dict["reduc percentage"]/100)))
             
         def reduc2():
-            statment["Total price currency"][i] -= ((statment["Total price currency"][i] * (Offers_dict["reduc2 percentage"]/100)))
+            statment.loc[i, "Total price currency"] -= ((statment.loc[i, "Total price currency"] * (Offers_dict["reduc2 percentage"]/100)))
             
         def offer(i,per):
-            statment["Total price currency"][i] -= (statment["Total price currency"][i] * (per/100))  
+            statment.loc[i, "Total price currency"] -= (statment.loc[i, "Total price currency"] * (per/100))  
             
         def offer_con(price,per):
             price -= (price * (per/100))  
@@ -602,8 +602,8 @@ elif password == ps:
                                 mapped_value = type_of_room_mapping[Type_of_room]
 
                             
-                            Total_price = statment["Total price currency"][i] * (statment[sen_column][i]/int(mapped_value)) * -(Offers_dict["senior percentage"]/100)
-                            statment["Total price currency"][i] += Total_price
+                            Total_price = statment.loc[i, "Total price currency"] * (statment[sen_column][i]/int(mapped_value)) * -(Offers_dict["senior percentage"]/100)
+                            statment.loc[i, "Total price currency"] += Total_price
                             
                             
                 # Early booking 1
@@ -821,9 +821,9 @@ elif password == ps:
                                 if cnt ==1:
                                     statment["Total price currency"][guest] = 0
                                 Summing = 0
-                                first_day_spo2 = SPO["first date"][0]
-                                last_day_spo2 = SPO["second date"].iloc[-1]
-                                date_arrival = statment.loc[guest, "Arrival"]
+                                first_day_spo2 = pd.Timestamp(SPO["first date"][0])
+                                last_day_spo2 = pd.Timestamp(SPO["second date"].iloc[-1])
+                                date_arrival = pd.Timestamp(statment.loc[guest, "Arrival"])
                                 if passing:
                                     date_arrival = new_arrival
                                 date_departure = statment.loc[guest, "Departure"] - timedelta(1)
