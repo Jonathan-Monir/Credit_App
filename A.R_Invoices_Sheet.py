@@ -574,11 +574,11 @@ elif password == ps:
                   
         if senior_bool:
             sen_column = st.selectbox('please select senior column',options=statment.columns.insert(0,None))
-        
+            
         # Here are the other new offers
         if "Offers_dict" in st.session_state:
             Offers_dict = st.session_state["Offers_dict"]
-            
+            s_error = 0
                     
                             
             for i in range(len(statment["Arrival"])):
@@ -655,6 +655,7 @@ elif password == ps:
                                     reduc2()
                                 
         # SPO's ******************************
+        
         def ceb1(cell,Spo_dict):
             if Spo_dict['eb1'][spo_num]:
                 return (cell['Res_date'] < Spo_dict['eb1 date'][spo_num]) and (Spo_dict['eb1'][spo_num])
@@ -671,6 +672,8 @@ elif password == ps:
             
             if Spo_dict['senior'][spo_num]:
                 return (Spo_dict['senior'][spo_num]) and (cell[sen_column] > 0)
+            
+                    
             else:
                 return False
             
@@ -698,7 +701,11 @@ elif password == ps:
                 
             if ceb2(cell,Spo_dict):
                 price = price * (1 - (Spo_dict['eb1 percentage'][spo_num]/100))
-             
+            
+            try:
+                csenior(cell,Spo_dict)
+            except:
+                st.error('Please Choose senior column first.')
             if csenior(cell,Spo_dict):
                 type_of_room_mapping = {
                                 "s": 1,

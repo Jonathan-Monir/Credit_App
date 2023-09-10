@@ -822,6 +822,13 @@ if "password" in st.session_state:
                 
                 # SPO
                 SPO = pd.read_excel(st.session_state["uploaded file"],sheet_name=Spo_name)
+                if 'SPO' not in Spo_dict:
+                    if 'Spo_dict' in st.session_state:
+                        if 'SPO' in st.session_state['Spo_dict']:
+                            Spo_dict['SPO'] = st.session_state['Spo_dict']['SPO']
+                    else:
+                        Spo_dict['SPO'] = range(20)
+                    
                 if selected_setting is not None:
                     Spo_dict['SPO'].append(SPO)
                 if not old:
@@ -925,7 +932,7 @@ if "password" in st.session_state:
                                 amount_val = st.session_state['Dis_dict']['amount'][i]
                                 days_val = st.session_state['Dis_dict']['days'][i]
                                 index = list(statment.columns.insert(0,None)).index(st.session_state['Dis_dict']['column'][i])
-                        amount = float(cl1.text_input(text,amount_val,key = "1w"*(2+i)))
+                        amount = float(cl1.text_input(text,amount_val,key = "1www"*(2+i+i*2)))
                         if all_dis_types.index(dis_type) == 2:
                             days = float(cl3.text_input('Minimum days',days_val,key = "1w"*(12+i)))
                         else:

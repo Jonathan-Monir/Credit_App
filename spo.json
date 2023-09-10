@@ -1,0 +1,92 @@
+{
+    "test1": {
+        "name": [
+            "SPO 07.12 TO 15.12 (1)",
+            "SPO 07.12 TO 15.12 (2)"
+        ],
+        "eb1": [
+            true,
+            true,
+            true
+        ],
+        "eb1 percentage": [
+            1.0,
+            1.0,
+            1.0
+        ],
+        "eb1 date": [
+            "2023-09-10",
+            "2023-09-10",
+            "2023-09-10"
+        ],
+        "eb2": [
+            true,
+            true,
+            true
+        ],
+        "eb2 date": [
+            "2023-09-10",
+            "2023-09-10",
+            "2023-09-10"
+        ],
+        "eb2 percentage": [
+            2.0,
+            2.0,
+            2.0
+        ],
+        "count": 2,
+        "senior": [
+            true,
+            true,
+            true
+        ],
+        "senior percentage": [
+            3.0,
+            3.0,
+            3.0
+        ],
+        "long term": [
+            true,
+            true,
+            true
+        ],
+        "lt days": [
+            4,
+            4,
+            4
+        ],
+        "lt percentage": [
+            5.0,
+            5.0,
+            5.0
+        ],
+        "reduc1": [
+            false,
+            false,
+            false
+        ],
+        "reduc2": [
+            false,
+            false,
+            false
+        ],
+        "reduc1 percentage": [
+            0,
+            0,
+            0
+        ],
+        "reduc2 percentage": [
+            0,
+            0,
+            0
+        ],
+        "start_date": [
+            "2023-01-02",
+            "2023-09-01"
+        ],
+        "end_date": [
+            "2023-03-10",
+            "2023-10-31"
+        ]
+    }
+}
