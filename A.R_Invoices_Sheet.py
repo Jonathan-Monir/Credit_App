@@ -252,7 +252,8 @@ elif password == ps:
                 date2_departure = pd.to_datetime(departure_row["second date"].values[0])
 
                 if date_departure <= date2_arrival:
-                    statment["Total price currency"][i] = price_arrival_night * ((date_departure-date_arrival).days)
+                    price = float(price_arrival_night * ((date_departure-date_arrival).days))
+                    statment["Total price currency"][i] = price
                     
                 else:
                     date_range = con[(date_arrival<=con["second date"]) & (date_departure>=con["first date"])]
@@ -340,7 +341,8 @@ elif password == ps:
                     date2_departure = pd.to_datetime(departure_row["second date"].values[0])
                     
                     if date_departure <= date2_arrival:
-                        statment["Total price currency"][i] = price_arrival_night * ((date_departure-date_arrival).days +1)
+                        price = float(price_arrival_night * ((date_departure-date_arrival).days +1))
+                        statment["Total price currency"][i] = price
                         
                     else:
                         date_range = con[(date_arrival<=con["first date"]) & (date_departure>=con["second date"])]
@@ -369,7 +371,8 @@ elif password == ps:
                         date2_departure = pd.to_datetime(departure_row["second date"].values[0])
                         
                         if date_departure <= date2_arrival:
-                            statment["Total price currency"][i] = price_arrival_night * ((date_departure-date_arrival).days +1)
+                            price = price_arrival_night * ((date_departure-date_arrival).days +1)
+                            statment["Total price currency"][i] = price
                         else:
                             date_range = spo[(date_arrival<=spo["first date"]) & (date_departure>=spo["second date"])]
                             diff = (date_range["second date"] - date_range["first date"]).dt.days + 1
@@ -436,42 +439,14 @@ elif password == ps:
                     if res_date >= spo_arrival_df["first date"][0] and res_date <= spo_arrival_df["second date"][0]:
                         if date_arrival >= spo_arrival_df["first date"][0] and date_arrival <= spo_arrival_df["second date"][0]:
                             price_arrival_night = spo_arrival_df[rate_code][0]
-                            statment["Total price currency"][i] = price_arrival_night * ((date_departure-date_arrival).days +1)
-                            
+                            price = price_arrival_night * ((date_departure-date_arrival).days +1)
+                            statment["Total price currency"][i] = price    
                         if date_arrival >= spo_arrival_df["first date"][1] and date_arrival <= spo_arrival_df["second date"][1]:
                             price_arrival_night = spo_arrival_df[rate_code][1]
-                            statment["Total price currency"][i] = price_arrival_night * ((date_departure-date_arrival).days +1)
-                        
+                            price = price_arrival_night * ((date_departure-date_arrival).days +1)
+                            statment["Total price currency"][i] = price
                     
 
-                        
-                    #         arrival_row = con[(con["first date"]<=date_arrival) & (con["second date"]>=date_arrival)]
-                    #         departure_row = con[(con["first date"]<=date_departure) & (con["second date"]>=date_departure)]
-
-                    #         price_arrival_night = arrival_row[rate_code]
-
-                    #         date1_arrival = pd.to_datetime(arrival_row["first date"].values[0])
-                    #         date2_arrival = pd.to_datetime(arrival_row["second date"].values[0])
-                            
-                    #         date1_departure = pd.to_datetime(departure_row["first date"].values[0])
-                    #         date2_departure = pd.to_datetime(departure_row["second date"].values[0])
-
-                    #         if date_departure <= date2_arrival:
-                    #             statment["Total price currency"][i] = price_arrival_night * ((date_departure-date_arrival).days +1)
-                                
-                    #         else:
-                    #             date_range = con[(date_arrival<=con["first date"]) & (date_departure>=con["second date"])]
-                                
-                    #             diff = (date_range["second date"] - date_range["first date"]).dt.days + 1
-
-                    #             for j in range(len(date_range[rate_code])):
-                    #                 Summing = (date_range[rate_code].iloc[j]*diff.iloc[j]) + Summing
-                                    
-                                    
-                    #             other_price = (((date2_arrival-date_arrival).days+1) * (arrival_row[rate_code].values[0]) + ((date_departure-date1_departure).days+1) * (departure_row[rate_code].values[0]))
-                                
-                    #             statment["Total price currency"][i] = Summing + other_price
-                    # else:
                 if SPO2_name:
                     Summing = 0
                     spo2 = pd.read_excel(uploaded_file,sheet_name=SPO2_name)
@@ -496,8 +471,8 @@ elif password == ps:
                             date2_departure = pd.to_datetime(departure_row["second date"].values[0])
                             
                             if date_departure <= date2_arrival:
-                                statment["Total price currency"][i] = price_arrival_night * ((date_departure-date_arrival).days +1)
-                                
+                                price = price_arrival_night * ((date_departure-date_arrival).days +1)
+                                statment["Total price currency"][i] = price
                             else:
                                 date_range = spo2[(date_arrival<=spo2["second date"]) & (date_departure>=spo2["first date"])]
                                 diff = (date_range["second date"] - date_range["first date"]).dt.days + 1
@@ -832,7 +807,10 @@ elif password == ps:
                     passing = False
                     cnt = 0
                     for spo_num in reversed(range(len(Spo_dict["name"]))):
-                        SPO = Spo_dict['SPO'][spo_num].copy()
+                        if 'SPO' in Spo_dict:
+                            SPO = Spo_dict['SPO'][spo_num].copy()
+                        else:
+                            SPO = pd.read_excel(st.session_state["uploaded file"],sheet_name=Spo_dict["name"][spo_num])
                         cell =  statment.iloc[guest,:]
                         
                         if (statment['Res_date'][guest] >= pd.Timestamp(Spo_dict['start_date'][spo_num])) and (statment['Res_date'][guest] <= pd.Timestamp(Spo_dict['end_date'][spo_num])):

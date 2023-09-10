@@ -65,17 +65,14 @@ if "password" in st.session_state:
                     # Check if the loaded data structure is not empty
                     if load_dict:
                         red_dict = load_dict
-                        print("JSON file is not empty.")
                     else:
                         red_dict = dict()
-                        print("JSON file is empty.")
                 except json.JSONDecodeError as e:
                     red_dict = dict()
-                    print(f"File '{file_path}' contains invalid JSON: {e}")
         except FileNotFoundError:
-            print(f"File '{file_path}' not found.")
+            pass
         except Exception as e:
-            print(f"An error occurred: {e}")
+            pass
         
         file_path = "combinations.json"
         #loading files
@@ -87,17 +84,14 @@ if "password" in st.session_state:
                     # Check if the loaded data structure is not empty
                     if load_dict:
                         com_dict = load_dict
-                        print("JSON file is not empty.")
                     else:
                         com_dict = dict()
-                        print("JSON file is empty.")
                 except json.JSONDecodeError as e:
                     com_dict = dict()
-                    print(f"File '{file_path}' contains invalid JSON: {e}")
         except FileNotFoundError:
-            print(f"File '{file_path}' not found.")
+            pass
         except Exception as e:
-            print(f"An error occurred: {e}")
+            pass
             
             
             
@@ -112,17 +106,17 @@ if "password" in st.session_state:
                     # Check if the loaded data structure is not empty
                     if load_dict:
                         s_dict = load_dict
-                        print("SPO_JSON file is not empty.")
+                        
                     else:
                         s_dict = dict()
-                        print("SPO_JSON file is empty.")
+                        
                 except json.JSONDecodeError as e:
                     s_dict = dict()
-                    print(f"SPO_File '{file_path}' contains invalid JSON: {e}")
+                    
         except FileNotFoundError:
-            print(f"SPO_File '{file_path}' not found.")
+            pass
         except Exception as e:
-            print(f"SPO_An error occurred: {e}")
+            pass
             
     
         file_path = "extra.json"
@@ -136,17 +130,14 @@ if "password" in st.session_state:
                     # Check if the loaded data structure is not empty
                     if load_dict:
                         e_dict = load_dict
-                        print("SPO_JSON file is not empty.")
                     else:
                         e_dict = dict()
-                        print("SPO_JSON file is empty.")
                 except json.JSONDecodeError as e:
                     e_dict = dict()
-                    print(f"SPO_File '{file_path}' contains invalid JSON: {e}")
         except FileNotFoundError:
-            print(f"SPO_File '{file_path}' not found.")
+            pass
         except Exception as e:
-            print(f"SPO_An error occurred: {e}")
+            pass
 
         def delete_dictionary_from_json(file_path, key_to_delete):
             try:
@@ -154,21 +145,17 @@ if "password" in st.session_state:
                 with open(file_path, 'r') as json_file:
                     data = json.load(json_file)
             except FileNotFoundError:
-                print(f"File '{file_path}' not found.")
                 return False
 
             # Step 2: Remove the dictionary or key-value pair you want to delete
             if key_to_delete in data:
                 del data[key_to_delete]
             else:
-                print(f"Key '{key_to_delete}' not found in the JSON data.")
                 return False
 
             # Step 3: Write the updated data structure back to the JSON file
             with open(file_path, 'w') as json_file:
                 json.dump(data, json_file, indent=4)
-
-            print(f"Dictionary with key '{key_to_delete}' has been deleted from the JSON file.")
             return True
 
         Offers_dict = {'eb1':False,
@@ -233,7 +220,8 @@ if "password" in st.session_state:
         
         # checkboxes
         if 'Offers_dict' in st.session_state:
-            st.session_state['Offers_dict'] = Offers_dict            
+            st.session_state['Offers_dict'] = Offers_dict     
+                   
         if 'Offers_dict' in st.session_state:
             Offers_dict = st.session_state["Offers_dict"]
         if 'new offers' in st.session_state:
@@ -823,6 +811,10 @@ if "password" in st.session_state:
                     
                     break
                 else:
+                    if selected_setting is not None:
+                        if len(Spo_dict['name']) == i:
+                            selected_setting = None
+                            
                     count +=1
                 if not old:
                     Spo_dict['name'].append(Spo_name)
