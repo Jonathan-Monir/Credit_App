@@ -658,13 +658,13 @@ elif password == ps:
         
         def ceb1(cell,Spo_dict):
             if Spo_dict['eb1'][spo_num]:
-                return (cell['Res_date'] < Spo_dict['eb1 date'][spo_num]) and (Spo_dict['eb1'][spo_num])
+                return (cell['Res_date'] < pd.Timestamp(Spo_dict['eb1 date'][spo_num])) and (Spo_dict['eb1'][spo_num])
             else:
                 return False
             
         def ceb2(cell,Spo_dict):
             if Spo_dict['eb2'][spo_num]:
-                return not(ceb1(cell, Spo_dict)) and(cell['Res_date'] < Spo_dict['eb2 date'][spo_num])
+                return not(ceb1(cell, Spo_dict)) and(cell['Res_date'] < pd.Timestamp(Spo_dict['eb2 date'][spo_num]))
             else:
                 return False
             

@@ -1076,20 +1076,21 @@ if "password" in st.session_state:
 
                     with open("extra.json", "w") as json_file:
                         json.dump(e_dict, json_file)     
-        # dicts = [red_dict,s_dict,com_dict,e_dict]
-        # # download json
-        # for i in dicts:
-        #     i = convert_dates_to_strings(i)
-        #     i = remove_spo_key(i)
-        #     json_string = json.dumps(i)
-        #     # st.json(json_string, expanded=True)
+        dicts = [red_dict,s_dict,com_dict,e_dict]
+        # download json
+        cnt=0
+        for i in range(len(dicts)):
+            dicts[i] = convert_dates_to_strings(dicts[i])
+            dicts[i] = remove_spo_key(dicts[i])
+            json_string = json.dumps(dicts[i])
+            # st.json(json_string, expanded=True)
 
-        #     st.download_button(
-        #         label="Download JSON",
-        #         file_name="data.json",
-        #         mime="application/json",
-        #         data=json_string,
-        #     )                     
+            st.download_button(
+                label="Download JSON",
+                file_name=str(dicts[i])+".json",
+                mime="application/json",
+                data=json_string,
+            )                     
 
 else:
     
