@@ -655,6 +655,7 @@ elif password == ps:
                                     reduc2()
                                 
         # SPO's ******************************
+        senior_cl = True
         
         def ceb1(cell,Spo_dict):
             if Spo_dict['eb1'][spo_num]:
@@ -669,9 +670,15 @@ elif password == ps:
                 return False
             
         def csenior(cell,Spo_dict):
-            
+            global senior_cl
             if Spo_dict['senior'][spo_num]:
-                return (Spo_dict['senior'][spo_num]) and (cell[sen_column] > 0)
+                try:
+                    return (Spo_dict['senior'][spo_num]) and (cell[sen_column] > 0)
+                except:
+                    if senior_cl:
+                        st.error('Please add senior column first')
+                        senior_cl = False
+                    return False
             
                     
             else:
@@ -701,7 +708,6 @@ elif password == ps:
                 
             if ceb2(cell,Spo_dict):
                 price = price * (1 - (Spo_dict['eb1 percentage'][spo_num]/100))
-            
             try:
                 csenior(cell,Spo_dict)
             except:
@@ -715,8 +721,8 @@ elif password == ps:
                             }
                 if Type_of_room in type_of_room_mapping:
                                 mapped_value = type_of_room_mapping[Type_of_room]
-                                
-                price = price * (1-(statment[sen_column][i]/int(mapped_value)) * -(Spo_dict["senior percentage"][spo_num]/100))
+                
+                price = price * (1-(statment[sen_column][guest]/int(mapped_value)) * (Spo_dict["senior percentage"][spo_num]/100))
                 
             if clt(cell,Spo_dict):
                 price = price * (1 - (Spo_dict['lt percentage'][spo_num]/100))
@@ -868,7 +874,9 @@ elif password == ps:
                                     other_price = (((date_arrival-date1_arrival).days) * (arrival_row[rate_code].values[0]) + ((date2_departure-date_departure).days) * (departure_row[rate_code].values[0]))
                                     
                                     price = Summing - other_price 
+                                    
                                     price = calculate_offer(cell,Spo_dict,price,spo_num)
+                                    
                                     statment["Total price currency"][guest] += price 
                                 if one_spo:
                                     break
@@ -936,6 +944,7 @@ elif password == ps:
                         elif all_dis_types.index(Dis_dict['type'][i])==2:
                             price = Dis_dict['amount'][i]
                             
+                            
                         if Dis_dict['column'][i] is None:
                             statment["Total price currency"][guest] += (price)
                         elif isinstance(statment[Dis_dict['column'][i]][guest],str):
@@ -971,7 +980,7 @@ elif password == ps:
         # extra
         if "Extra" in statment.columns:
             statment["Extra"] = statment["Extra"].fillna(0)
-            statment['Total price currency'] += statment['Extra']
+            statment["Total price currency"] += statment['Extra']
             
         statment.drop(columns=["other_price","UnNeeded_price"],inplace=True)
         if "Amount-hotel" in statment.columns:
@@ -1041,7 +1050,7 @@ elif password == ps:
         if 'Adj.' in statment.columns:
             statment.drop(columns="Adj.",inplace=True)
             
-        statment['Total price currency'] = statment['Total price currency'].round(2).apply(lambda x: '{:.2f}'.format(x))
+        statment["Total price currency"] = statment["Total price currency"].round(2).apply(lambda x: '{:.2f}'.format(x))
         fill_pattern = PatternFill(patternType='solid',fgColor='C64747')
         import pandas as pd
         if 'Arrival' in statment.columns and pd.api.types.is_datetime64_any_dtype(statment['Arrival']):
