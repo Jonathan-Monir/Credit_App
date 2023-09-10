@@ -942,7 +942,11 @@ elif password == ps:
                             price = -(Dis_dict['amount'][i]/100) * statment["Total price currency"][guest]
                             
                         elif all_dis_types.index(Dis_dict['type'][i])==2:
-                            price = Dis_dict['amount'][i]
+                            if 'Pax' in statment.columns:
+                                pax = statment['Pax'][guest]
+                            else:
+                                pax = 1
+                            price = Dis_dict['amount'][i] * pax
                             
                             
                         if Dis_dict['column'][i] is None:
