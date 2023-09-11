@@ -815,6 +815,7 @@ elif password == ps:
         numeric_pattern = r'^[+-]?(\d*\.\d+|\d+(,\d{3})*|\d+)$'
         if "Spo_dict" in st.session_state:
             Spo_dict = st.session_state["Spo_dict"]
+            
             for guest in range(len(statment['Arrival'])):
                 if len(Spo_dict["name"]) > 0:
                     passing = False
@@ -825,7 +826,11 @@ elif password == ps:
                         else:
                             SPO = pd.read_excel(st.session_state["uploaded file"],sheet_name=Spo_dict["name"][spo_num])
                         cell =  statment.iloc[guest,:]
-                        
+                        st.write(SPO)
+                        threshold = 2
+                        SPO = SPO.dropna(thresh=len(SPO.columns) - threshold + 1)
+                        st.write(SPO)
+
                         if (statment['Res_date'][guest] >= pd.Timestamp(Spo_dict['start_date'][spo_num])) and (statment['Res_date'][guest] <= pd.Timestamp(Spo_dict['end_date'][spo_num])):
                             
                             if (statment['Arrival'][guest] >= SPO['first date'][0]) and (statment['Arrival'][guest] <= SPO['second date'].iloc[-1]):
