@@ -826,10 +826,8 @@ elif password == ps:
                         else:
                             SPO = pd.read_excel(st.session_state["uploaded file"],sheet_name=Spo_dict["name"][spo_num])
                         cell =  statment.iloc[guest,:]
-                        st.write(SPO)
                         threshold = 2
                         SPO = SPO.dropna(thresh=len(SPO.columns) - threshold + 1)
-                        st.write(SPO)
 
                         if (statment['Res_date'][guest] >= pd.Timestamp(Spo_dict['start_date'][spo_num])) and (statment['Res_date'][guest] <= pd.Timestamp(Spo_dict['end_date'][spo_num])):
                             
