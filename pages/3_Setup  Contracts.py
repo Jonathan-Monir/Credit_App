@@ -879,7 +879,7 @@ if "password" in st.session_state:
                         'type':list(),
                         'days':list(),
                         'column':list()}
-            all_dis_types = [None,'reduction','rise']
+            all_dis_types = [None,'reduction','extra']
                 
             if selected_setting is not None:
                 Dis_dict = e_dict[selected_setting]
@@ -920,7 +920,7 @@ if "password" in st.session_state:
                         text = "reduction percentage"
                         cl1, cl2 = st.columns([1,2])
                     elif all_dis_types.index(dis_type) == 2:
-                        text = "Rise amount"
+                        text = "extra amount"
                         cl1, cl2, cl3 = st.columns([1,2,2])
                     if (len(Dis_dict['type'])>= i+1) and (len(Dis_dict['column'])>= i+1):
                         if selected_setting is not None:
