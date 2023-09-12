@@ -656,7 +656,8 @@ elif password == ps:
                                 
         # SPO's ******************************
         senior_cl = True
-        
+        def invoice_cost(invoice,start,end):
+            
         def ceb1(cell,Spo_dict):
             if Spo_dict['eb1'][spo_num]:
                 return (cell['Res_date'] < pd.Timestamp(Spo_dict['eb1 date'][spo_num])) and (Spo_dict['eb1'][spo_num])
@@ -811,7 +812,7 @@ elif password == ps:
                                 price = offer_con(price,Offers_dict['reduc2 percentage'])
 
             return price
-        all_dis_types = [None,'reduction','rise']
+        all_dis_types = [None,'reduction','extra']
         numeric_pattern = r'^[+-]?(\d*\.\d+|\d+(,\d{3})*|\d+)$'
         if "Spo_dict" in st.session_state:
             Spo_dict = st.session_state["Spo_dict"]
