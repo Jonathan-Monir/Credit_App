@@ -181,7 +181,9 @@ if "password" in st.session_state:
         if "null" in red_dict.keys():
             delete_dictionary_from_json('reductions.json','null')
             del red_dict['null']
+        
         selected_setting = st.selectbox("select the setting you want to use.",options=red_dict.keys(), index= len(red_dict)-1)
+        
         if selected_setting is not None:
             delete = st.button("delete costum")
             if delete:
@@ -823,19 +825,17 @@ if "password" in st.session_state:
                 # SPO
                 SPO = pd.read_excel(st.session_state["uploaded file"],sheet_name=Spo_name)
                 if 'SPO' not in Spo_dict:
-                    if 'Spo_dict' in st.session_state:
-                        if 'SPO' in st.session_state['Spo_dict']:
-                            Spo_dict['SPO'] = st.session_state['Spo_dict']['SPO']
-                    else:
-                        Spo_dict['SPO'] = range(20)
+                    Spo_dict['SPO'] = list()
                     
+                
                 if selected_setting is not None:
                     Spo_dict['SPO'].append(SPO)
                 if not old:
                     Spo_dict['SPO'].append(SPO)
                 else:
-                    Spo_dict['SPO'][i] = SPO
-                
+                    if 'SPO' in st.session_state:
+                        Spo_dict['SPO'][i] = SPO
+                    
                 # date
                 cl1, cl2 = st.columns([1,2])
                 s_date = SPO["first date"][0]

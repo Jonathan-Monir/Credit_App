@@ -1,1 +1,20 @@
-{"Hotel Dana B. Contract summer": {"amount": [10.0, 25.0], "type": ["reduction", "rise"], "days": [0, 7.0], "column": ["Reduction 1 (cruise -10%)", "Extra (min. 7 days+25Euro)"]}}
+{
+    "Hotel Dana B. Contract summer": {
+        "amount": [
+            10.0,
+            25.0
+        ],
+        "type": [
+            "reduction",
+            "extra"
+        ],
+        "days": [
+            0,
+            7.0
+        ],
+        "column": [
+            "Reduction 1 (cruise -10%)",
+            "Extra (min. 7 days+25Euro)"
+        ]
+    }
+}
