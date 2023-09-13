@@ -182,8 +182,18 @@ if "password" in st.session_state:
             delete_dictionary_from_json('reductions.json','null')
             del red_dict['null']
         
-        selected_setting = st.selectbox("select the setting you want to use.",options=red_dict.keys(), index= len(red_dict)-1)
         
+        
+        def change_setting():
+            if 'TSK' in st.session_state:
+                st.session_state.selected_setting = list(red_dict.keys()).index(st.session_state.TSK)
+                
+        if 'selected_setting' not in st.session_state:
+            st.session_state.selected_setting = len(red_dict)-1
+        
+        selected_setting = st.selectbox("select the setting you want to use.",options=red_dict.keys(), index= st.session_state.selected_setting, on_change=change_setting, key = "TSK")
+       
+       
         if selected_setting is not None:
             delete = st.button("delete costum")
             if delete:
