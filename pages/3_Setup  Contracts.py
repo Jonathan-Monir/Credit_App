@@ -803,6 +803,7 @@ if "password" in st.session_state:
                 # name
                 if (len(Spo_dict['name']) >= i+1):
                     old = True
+                    sheet_index = sheet_names.index(Spo_dict['name'][i])
                     if (selected_setting is not None) and (Spo_dict['name'][i] in sheet_names) and (Spo_dict['name'][i] is not None):
                         sheet_index = sheet_names.index(Spo_dict['name'][i])
                     elif ("Spo_dict" in st.session_state):
