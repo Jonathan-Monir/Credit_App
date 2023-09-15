@@ -803,7 +803,8 @@ if "password" in st.session_state:
                 # name
                 if (len(Spo_dict['name']) >= i+1):
                     old = True
-                    sheet_index = sheet_names.index(Spo_dict['name'][i])
+                    sheet_index = list(s_dict.keys()).index(None)
+                    
                     if (selected_setting is not None) and (Spo_dict['name'][i] in sheet_names) and (Spo_dict['name'][i] is not None):
                         sheet_index = sheet_names.index(Spo_dict['name'][i])
                     elif ("Spo_dict" in st.session_state):
@@ -937,7 +938,7 @@ if "password" in st.session_state:
                         if selected_setting is not None:
                             amount_val = Dis_dict['amount'][i]
                             days_val = Dis_dict['days'][i]
-                                
+                            
                             index = list(statment.columns.insert(0,None)).index(Dis_dict['column'][i])
                         elif 'Dis_dict' in st.session_state:
                                 amount_val = st.session_state['Dis_dict']['amount'][i]
