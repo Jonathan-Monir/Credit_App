@@ -6,6 +6,7 @@ import openpyxl
 from PIL import Image
 import streamlit as st
 import warnings
+import numpy as np
 # Add this line at the beginning of your script or function to ignore the warning
 pd.options.mode.chained_assignment = None
 
@@ -209,7 +210,7 @@ elif password == ps:
         statment["other_price"]=0
         statment["UnNeeded_price"]=0
         statment["Total price currency"]=0
-
+        
         SPO_name = st.selectbox(
             'Choose special offer sheet',
             sheet_names, key="0")
@@ -247,7 +248,6 @@ elif password == ps:
                 date1_arrival = pd.to_datetime(arrival_row["first date"].values[0])
                 date2_arrival = pd.to_datetime(arrival_row["second date"].values[0])
                 
-                
                 date1_departure = pd.to_datetime(departure_row["first date"].values[0])
                 date2_departure = pd.to_datetime(departure_row["second date"].values[0])
 
@@ -277,8 +277,6 @@ elif password == ps:
                         nights = statment["Departure"][i] - statment["Arrival"][i]
                         statment.loc[i, "Total price currency"] = float(night_price * nights.days)
                 
-
-                    
         else:
             
             SPO2_name = st.selectbox(
@@ -810,15 +808,93 @@ elif password == ps:
                                 price = offer_con(price,Offers_dict['reduc2 percentage'])
 
             return price
+        
+        def append_and_pad(original_array, new_array):
+            if original_array.ndim == 1:
+                original_array = [original_array]
+            # Find the maximum length between the two arrays
+            max_length = max(len(original_array[0]), len(new_array))
+            
+            # Pad both arrays with zeros to match the maximum length
+            original_array_padded = np.pad(original_array, ((0, 0), (0, max_length - len(original_array[0]))), 'constant')
+            new_array_padded = np.pad(new_array, (0, max_length - len(new_array)), 'constant')
+            
+            # Stack the two arrays vertically
+            result = np.vstack((original_array_padded, new_array_padded))
+            
+            return result
+        def contract_removal(con, date1, date2,cell):
+    
+            arr = cell['Arrival']
+            dep = cell['Departure'] - timedelta(1)
+            code = cell['Rate code']
+            
+            con1 = con[(arr<=con["second date"]) & (date1>=con["first date"])]
+            con2 = con[(date2<=con["second date"]) & (dep>=con["first date"])]
+            
+            con1['first date'].iloc[0] = arr
+            con1['second date'].iloc[-1] = date1
+            
+            con2['first date'].iloc[0] = date2
+            con2['second date'].iloc[-1] = dep
+            
+            result = pd.concat([con1, con2], axis=0)
+            if date2 == dep:
+                result = con1
+            empty_df = result.empty
+            days = 0 
+            price = 0
+            
+            if not empty_df:
+                days = np.array((result['second date'] - result['first date']).dt.days)
+                price = np.array(result[cell['Rate code']])
+            return result
+            
+        def invoice_optimizer(cell,invoice):
+            begin_date = invoice['first date'].iloc[0]
+            end_date = invoice['second date'].iloc[-1]
+            
+            arr = cell['Arrival']
+            dep = cell['Departure'] - timedelta(1)
+            code = cell['Rate code']
+
+            if begin_date > arr:
+                arr = begin_date
+            if end_date < dep:
+                dep = end_date
+            
+            date_range = invoice[(arr<=invoice["second date"]) & (dep>=invoice["first date"])]
+            empty_df = date_range.empty
+            
+            days = 0 
+            price = 0
+            
+            if not empty_df:
+                date_range['first date'].iloc[0] = arr
+                date_range['second date'].iloc[-1] = dep
+                
+                days = np.array((date_range['second date'] - date_range['first date']).dt.days +1)
+                price = np.array(date_range[cell['Rate code']])
+            
+            return days, price, arr, dep, empty_df
+        
         all_dis_types = [None,'reduction','extra']
         numeric_pattern = r'^[+-]?(\d*\.\d+|\d+(,\d{3})*|\d+)$'
+        days = np.empty(0)
+        price = np.empty(0)
         if "Spo_dict" in st.session_state:
             Spo_dict = st.session_state["Spo_dict"]
             
-            for guest in range(len(statment['Arrival'])):
-                if len(Spo_dict["name"]) > 0:
+            con2spo_once = False
+            if len(Spo_dict["name"]) > 0:
+                for guest in range(len(statment['Arrival'])):
                     passing = False
                     cnt = 0
+                    con2spo = False
+                    contract = False
+                    spo_days = np.empty(0)
+                    spo_price = np.zeros(0)
+                    
                     for spo_num in reversed(range(len(Spo_dict["name"]))):
                         if 'SPO' in Spo_dict:
                             SPO = Spo_dict['SPO'][spo_num].copy()
@@ -932,6 +1008,34 @@ elif password == ps:
                                             night_price = spo_arrival_df[rate_code][1]
                                             nights = statment["Departure"][guest] - statment["Arrival"][guest]
                                             statment["Total price currency"][guest] += float(night_price * nights.days)
+                                st.write(guest)
+                            elif not (statment['Arrival'][guest] >= SPO['first date'][0]):
+                                con2spo = True
+                                invoice_result = invoice_optimizer(cell, SPO)
+                                
+                                spo_days = np.append(spo_days,invoice_result[0]).reshape(-1,1)
+                                spo_price = np.append(spo_price,invoice_result[1]).reshape(-1,1)
+                                
+                                price = calculate_offer(np.sum(np.multiply(spo_days,spo_price)))
+                                statment['Total price currency'][guest] = price
+                                date1 = invoice_result[2]
+                                date2 = invoice_result[3]
+                                
+                                empty_df = invoice_result[4]
+                                if isinstance(contract,bool):
+                                    contract = con
+                                if not empty_df:
+                                    contract = contract_removal(contract,date1,date2,cell)
+                                
+                    if con2spo:
+                        con2spo_once = True
+                        spo_days = (invoice_optimizer(cell,contract)[0]).reshape(-1,1)
+                        spo_price = (invoice_optimizer(cell,contract)[1]).reshape(-1,1)
+
+                        price = calculate_offer_con(np.sum(np.multiply(spo_days,spo_price)))
+                        statment['Total price currency'][guest] += price
+
+                                
                                             
                         
                 # Reductions
