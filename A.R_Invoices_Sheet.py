@@ -7,6 +7,7 @@ from PIL import Image
 import streamlit as st
 import warnings
 import numpy as np
+import re
 # Add this line at the beginning of your script or function to ignore the warning
 pd.options.mode.chained_assignment = None
 
@@ -783,12 +784,19 @@ elif password == ps:
                             if ((cell["Departure"] - cell["Arrival"]).days > Offers_dict["lt days"]):
                                 price = offer_con(price,Offers_dict['lt percentage'])
                                 
-                        
+            search_term = 'reduction 1'
+            matching_columns = [col for col in statment.columns if re.search(f'(?i){search_term}', col)]
+
+            # Print the matching columns
             # reduction 1
-            if "reduc" in Offers_dict:
-                if (Offers_dict["reduc"]):
+            if "reduc1" in Offers_dict:
+                if (Offers_dict["reduc1"]):
                     if "FormSubmitter:Combinations-Submit" not in st.session_state:
-                        price = offer_con(price,Offers_dict['reduc1 percentage'])
+                        if matching_columns:
+                            if statment[matching_columns].iloc[guest][0].lower() == 'yes':
+                                price = offer_con(price,Offers_dict['reduc1 percentage'])
+                        else:
+                            price = offer_con(price,Offers_dict['reduc1 percentage'])
                 else:
                     if "reduction_combin" in Offers_dict:
                         if Offers_dict["reduction_combin"]:
@@ -901,10 +909,11 @@ elif password == ps:
                         cell =  statment.iloc[guest,:]
                         threshold = 2
                         SPO = SPO.dropna(thresh=len(SPO.columns) - threshold + 1)
-
+                        
                         if (statment['Res_date'][guest] >= pd.Timestamp(Spo_dict['start_date'][spo_num])) and (statment['Res_date'][guest] <= pd.Timestamp(Spo_dict['end_date'][spo_num])):
                             
                             if (statment['Arrival'][guest] >= SPO['first date'][0]) and (statment['Arrival'][guest] <= SPO['second date'].iloc[-1]):
+                                
                                 cnt +=1
                                 if cnt ==1:
                                     statment["Total price currency"][guest] = 0
@@ -936,6 +945,7 @@ elif password == ps:
                                 
                                 if date_departure <= date2_arrival:
                                     price = price_arrival_night * ((date_departure-date_arrival).days +1)
+                                    
                                     price = calculate_offer(cell,Spo_dict,price,spo_num)
                                     statment["Total price currency"][guest] += price
                                     
@@ -976,8 +986,8 @@ elif password == ps:
                                     date2_departure = pd.to_datetime(departure_row["second date"].values[0])
                                     if date_departure <= date2_arrival:
                                         price = price_arrival_night * ((date_departure-date_arrival).days +1)
-
                                         price = calculate_offer_con(cell,price)
+                                        
                                         statment["Total price currency"][guest] += price
                                         
                                     else:
@@ -1006,7 +1016,8 @@ elif password == ps:
                                             night_price = spo_arrival_df[rate_code][1]
                                             nights = statment["Departure"][guest] - statment["Arrival"][guest]
                                             statment["Total price currency"][guest] += float(night_price * nights.days)
-                            elif not (statment['Arrival'][guest] >= SPO['first date'][0]):
+                            else:
+                                
                                 con2spo = True
                                 invoice_result = invoice_optimizer(cell, SPO)
                                 
@@ -1028,6 +1039,7 @@ elif password == ps:
                         con2spo_once = True
                         spo_days = (invoice_optimizer(cell,contract)[0]).reshape(-1,1)
                         spo_price = (invoice_optimizer(cell,contract)[1]).reshape(-1,1)
+                        
 
                         price = calculate_offer_con(np.sum(np.multiply(spo_days,spo_price)))
                         statment['Total price currency'][guest] += price
