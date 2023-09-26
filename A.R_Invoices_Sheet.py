@@ -209,7 +209,7 @@ elif password == ps:
         statment["other_price"]=0
         statment["UnNeeded_price"]=0
         statment["Total price currency"]=0
-
+        
         SPO_name = st.selectbox(
             'Choose special offer sheet',
             sheet_names, key="0")
@@ -277,8 +277,6 @@ elif password == ps:
                         nights = statment["Departure"][i] - statment["Arrival"][i]
                         statment.loc[i, "Total price currency"] = float(night_price * nights.days)
                 
-
-                    
         else:
             
             SPO2_name = st.selectbox(
@@ -815,8 +813,8 @@ elif password == ps:
         if "Spo_dict" in st.session_state:
             Spo_dict = st.session_state["Spo_dict"]
             
-            for guest in range(len(statment['Arrival'])):
-                if len(Spo_dict["name"]) > 0:
+            if len(Spo_dict["name"]) > 0:
+                for guest in range(len(statment['Arrival'])):
                     passing = False
                     cnt = 0
                     for spo_num in reversed(range(len(Spo_dict["name"]))):
