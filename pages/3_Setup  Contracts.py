@@ -193,7 +193,6 @@ if "password" in st.session_state:
         
         selected_setting = st.selectbox("select the setting you want to use.",options=red_dict.keys(), index= st.session_state.selected_setting, on_change=change_setting, key = "TSK")
        
-       
         if selected_setting is not None:
             delete = st.button("delete costum")
             if delete:
@@ -208,7 +207,7 @@ if "password" in st.session_state:
                 selected_setting = None
                 st.experimental_rerun()
         old_file_dict = red_dict
-        
+
            
         column1,column2 = st.columns([1,3.5])
                 

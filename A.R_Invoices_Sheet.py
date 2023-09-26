@@ -212,7 +212,7 @@ elif password == ps:
         statment["other_price"]=0
         statment["UnNeeded_price"]=0
         statment["Total price currency"]=0
-        
+                
         SPO_name = st.selectbox(
             'Choose special offer sheet',
             sheet_names, key="0")
@@ -893,7 +893,6 @@ elif password == ps:
         price = np.empty(0)
         if "Spo_dict" in st.session_state:
             Spo_dict = st.session_state["Spo_dict"]
-            
             con2spo_once = False
             if len(Spo_dict["name"]) > 0:
                 for guest in range(len(statment['Arrival'])):
@@ -1319,13 +1318,3 @@ elif password == ps:
             if checked:
                 
                 st.table(diffs)
-        # df_xlsx, filename = to_excel(statment)
-
-        # # Get the current filepath
-        # current_filepath = os.getcwd()
-        # # Combine the current filepath with the filename to get the full file path
-        # output_filepath = os.path.join(current_filepath, filename)
-        # print(output_filepath)
-        # # Write the Excel file to the current filepath
-        # with open(r"D:\vscoded\Excl\app V.0\SPO_app-win32-x64\Result sheet.xlsx", 'wb') as f:
-        #     f.write(df_xlsx)
