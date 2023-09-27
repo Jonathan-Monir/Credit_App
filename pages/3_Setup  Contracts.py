@@ -1088,6 +1088,7 @@ if "password" in st.session_state:
                     with open("extra.json", "w") as json_file:
                         json.dump(e_dict, json_file)     
         dicts = [red_dict,s_dict,com_dict,e_dict]
+        
         # download json
         cnt=0
         for i in range(len(dicts)):
