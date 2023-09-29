@@ -579,8 +579,7 @@ elif password == ps:
         if "Offers_dict" in st.session_state:
             Offers_dict = st.session_state["Offers_dict"]
             s_error = 0
-                    
-                            
+                               
             for i in range(len(statment["Arrival"])):
                 
                 # senior
@@ -631,16 +630,17 @@ elif password == ps:
                             if Combin_dict["long term_combin"]:
                                 if ((statment["Departure"][i] - statment["Arrival"][i]).days > Offers_dict["lt days"]):
                                     LT()
-                                    
+                
                 # reduction 1
                 if "reduc1" in Offers_dict:
                     if (Offers_dict["reduc1"]):
                         if "FormSubmitter:Combinations-Submit" not in st.session_state:
                             reduc()
-                    else:
-                        if "reduction_combin" in Offers_dict:
-                            if Offers_dict["reduction_combin"]:
-                                reduc()
+                            
+                        else:
+                            if "reduction_combin" in Offers_dict:
+                                if Offers_dict["reduction_combin"]:
+                                    reduc()
                         
                 # reduction 2
                 if "reduc2" in Offers_dict:
@@ -722,7 +722,9 @@ elif password == ps:
                 Type_of_room = statment["Rate code"][guest][0].lower()
                 if Type_of_room in type_of_room_mapping:
                                 mapped_value = type_of_room_mapping[Type_of_room] 
+                
                 price = price * (1-(statment[sen_column][guest]/int(mapped_value)) * (Spo_dict["senior percentage"][spo_num]/100))
+                
                 
             if clt(cell,Spo_dict):
                 price = price * (1 - (Spo_dict['lt percentage'][spo_num]/100))
@@ -933,6 +935,7 @@ elif password == ps:
                                 arrival_row = SPO[(SPO["first date"]<=date_arrival) & (SPO["second date"]>=date_arrival)]
                                 
                                 price_arrival_night = arrival_row[rate_code]
+                                
                                 date1_arrival = pd.to_datetime(arrival_row["first date"].values[0])
                                 date2_arrival = pd.to_datetime(arrival_row["second date"].values[0])
                                 
@@ -947,8 +950,8 @@ elif password == ps:
                                 
                                 if date_departure <= date2_arrival:
                                     price = price_arrival_night * ((date_departure-date_arrival).days +1)
-                                    
                                     price = calculate_offer(cell,Spo_dict,price,spo_num)
+                                    
                                     
                                     statment["Total price currency"][guest] += price
                                     
