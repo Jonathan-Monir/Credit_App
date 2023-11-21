@@ -63,17 +63,18 @@ elif password == ps:
         
     
 
-    if "uploaded file" not in st.session_state:
-        uploaded_file = st.file_uploader("Choose a file")
-        st.session_state["uploaded file"] = uploaded_file
-        
-    elif st.session_state["uploaded file"] is None:
-        uploaded_file = st.file_uploader("Choose a file")
-        st.session_state["uploaded file"] = uploaded_file
+    def upload_file():
+        st.session_state["filename"] = st.session_state["input_file"]
 
+    if "filename" not in st.session_state:
+        st.session_state["filename"] = None
+        uploaded_file = st.file_uploader("Choose a file", key = "input_file", on_change=upload_file)
+        
     else:
-        uploaded_file = st.file_uploader("Choose a file")
-        uploaded_file = st.session_state["uploaded file"]
+        uploaded_file = st.file_uploader("Choose a file", key = "input_file", on_change=upload_file)
+        st.success(f"{st.session_state.filename.name} is choosen")
+    
+    uploaded_file = st.session_state["filename"]
         
     if uploaded_file is not None:
         
@@ -579,7 +580,6 @@ elif password == ps:
         if "Offers_dict" in st.session_state:
             Offers_dict = st.session_state["Offers_dict"]
             s_error = 0
-                               
             for i in range(len(statment["Arrival"])):
                 
                 # senior
@@ -632,6 +632,7 @@ elif password == ps:
                                     LT()
                 
                 # reduction 1
+                
                 if "reduc1" in Offers_dict:
                     if (Offers_dict["reduc1"]):
                         if "FormSubmitter:Combinations-Submit" not in st.session_state:
@@ -641,6 +642,8 @@ elif password == ps:
                             if "reduction_combin" in Offers_dict:
                                 if Offers_dict["reduction_combin"]:
                                     reduc()
+                            else:
+                                reduc()
                         
                 # reduction 2
                 if "reduc2" in Offers_dict:
@@ -651,6 +654,8 @@ elif password == ps:
                             if "reduction2_combin" in Combin_dict:
                                 if Combin_dict["reduction2_combin"]:
                                     reduc2()
+                            else:
+                                reduc()
                                 
         # SPO's ******************************
         senior_cl = True
