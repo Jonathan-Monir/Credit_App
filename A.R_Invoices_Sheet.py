@@ -934,6 +934,7 @@ elif password == ps:
                                 rate_code = statment["Rate code"][guest]
                                 arrival_row = SPO[(SPO["first date"]<=date_arrival) & (SPO["second date"]>=date_arrival)]
                                 
+                                st.write(arrival_row)
                                 price_arrival_night = arrival_row[rate_code]
                                 
                                 date1_arrival = pd.to_datetime(arrival_row["first date"].values[0])
@@ -950,8 +951,8 @@ elif password == ps:
                                 
                                 if date_departure <= date2_arrival:
                                     price = price_arrival_night * ((date_departure-date_arrival).days +1)
-                                    price = calculate_offer(cell,Spo_dict,price,spo_num)
                                     
+                                    price = calculate_offer(cell,Spo_dict,price,spo_num)
                                     
                                     statment["Total price currency"][guest] += price
                                     
