@@ -934,7 +934,6 @@ elif password == ps:
                                 rate_code = statment["Rate code"][guest]
                                 arrival_row = SPO[(SPO["first date"]<=date_arrival) & (SPO["second date"]>=date_arrival)]
                                 
-                                st.write(arrival_row)
                                 price_arrival_night = arrival_row[rate_code]
                                 
                                 date1_arrival = pd.to_datetime(arrival_row["first date"].values[0])
